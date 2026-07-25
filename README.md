@@ -20,4 +20,16 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ## セットアップ
 
-実装が進み次第、ここに手順を追記します。
+### バックエンド（Spring Boot）
+
+前提: Java 25 が必要です（Homebrewの場合 `brew install openjdk@25`）。
+
+```sh
+cd backend
+export JAVA_HOME=/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home
+./gradlew bootRun
+```
+
+起動後、`http://localhost:8080/api/health` にアクセスすると `{"status":"ok"}` が返ります。
+
+現時点ではSpring Bootの雛形のみで、PostgreSQL/JPAとの連携は未実装です。
