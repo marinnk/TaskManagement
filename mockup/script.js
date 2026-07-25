@@ -136,6 +136,12 @@ function createListElement(list) {
   const nameEl = document.createElement("h2");
   nameEl.className = "list-name";
   nameEl.textContent = list.name;
+
+  const countEl = document.createElement("span");
+  countEl.className = "list-count";
+  countEl.textContent = list.cards.length;
+  nameEl.appendChild(countEl);
+
   listEl.appendChild(nameEl);
 
   const cardListEl = document.createElement("div");
