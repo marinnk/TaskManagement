@@ -15,6 +15,30 @@
   <!-- リスト（未着手／作業中／完了）は script.js が描画する -->
 </main>
 
+<div class="modal-overlay hidden" id="card-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="card-modal-heading">
+    <h2 id="card-modal-heading">カードを追加</h2>
+    <form id="card-form">
+      <label class="modal-field">
+        <span>タイトル</span>
+        <input type="text" id="card-title-input" maxlength="200" required>
+      </label>
+      <label class="modal-field">
+        <span>説明</span>
+        <textarea id="card-desc-input" rows="4"></textarea>
+      </label>
+      <label class="modal-field">
+        <span>期限</span>
+        <input type="date" id="card-due-input">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="card-modal-cancel">キャンセル</button>
+        <button type="submit" class="btn-primary" id="card-modal-submit">追加</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>

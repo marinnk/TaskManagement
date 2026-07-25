@@ -8,7 +8,7 @@
 |---|---|
 | Board | id, ボード名 |
 | List | id, リスト名, 所属Board, 表示順 |
-| Card | id, タイトル, 所属List, 表示順 |
+| Card | id, タイトル, 説明, 期限, 所属List, 表示順 |
 
 ## テーブル定義
 
@@ -34,6 +34,8 @@
 |---|---|---|---|
 | id | BIGINT | PK, AUTO_INCREMENT | カードID |
 | title | VARCHAR(200) | NOT NULL | カードのタイトル |
+| description | TEXT | NULL可 | カードの説明 |
+| due_date | DATE | NULL可 | カードの期限 |
 | list_id | BIGINT | FK → list.id, NOT NULL | 所属リストID |
 | display_order | INT | NOT NULL | リスト内での表示順（0始まり） |
 

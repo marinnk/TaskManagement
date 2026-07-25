@@ -37,11 +37,29 @@ function findList(listId) {
   return state.lists.find((list) => list.id === listId);
 }
 
-function addCard(listId, title) {
+function addCard(listId, title, description, dueDate) {
   const trimmed = title.trim();
   if (!trimmed) return;
   const list = findList(listId);
-  list.cards.push({ id: state.nextId++, title: trimmed });
+  list.cards.push({
+    id: state.nextId++,
+    title: trimmed,
+    description: description ? description.trim() : "",
+    dueDate: dueDate || null,
+  });
+  saveState(state);
+  render();
+}
+
+function updateCard(listId, cardId, title, description, dueDate) {
+  const trimmed = title.trim();
+  if (!trimmed) return;
+  const list = findList(listId);
+  const card = list.cards.find((c) => c.id === cardId);
+  if (!card) return;
+  card.title = trimmed;
+  card.description = description ? description.trim() : "";
+  card.dueDate = dueDate || null;
   saveState(state);
   render();
 }
@@ -69,7 +87,26 @@ function createCardElement(listId, card) {
   const cardEl = document.createElement("div");
   cardEl.className = "card";
   cardEl.draggable = true;
-  cardEl.textContent = card.title;
+  if (card.description) {
+    cardEl.title = card.description;
+  }
+
+  const titleEl = document.createElement("div");
+  titleEl.className = "card-title";
+  titleEl.textContent = card.title;
+  cardEl.appendChild(titleEl);
+
+  if (card.dueDate) {
+    const dueEl = document.createElement("div");
+    dueEl.className = "card-due";
+    dueEl.textContent = `期限: ${card.dueDate}`;
+    cardEl.appendChild(dueEl);
+  }
+
+  cardEl.addEventListener("dblclick", (e) => {
+    if (e.target.closest(".card-delete")) return;
+    openEditCardModal(listId, card);
+  });
 
   cardEl.addEventListener("dragstart", (e) => {
     e.dataTransfer.setData(
@@ -127,26 +164,11 @@ function createListElement(list) {
   const addCardEl = document.createElement("div");
   addCardEl.className = "add-card";
 
-  const input = document.createElement("input");
-  input.type = "text";
-  input.placeholder = "カードのタイトルを入力";
-
-  const submit = () => {
-    addCard(list.id, input.value);
-    input.value = "";
-    input.focus();
-  };
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") submit();
-  });
-
   const addBtn = document.createElement("button");
   addBtn.type = "button";
   addBtn.textContent = "+ カード追加";
-  addBtn.addEventListener("click", submit);
+  addBtn.addEventListener("click", () => openCardModal(list.id));
 
-  addCardEl.appendChild(input);
   addCardEl.appendChild(addBtn);
   listEl.appendChild(addCardEl);
 
@@ -160,6 +182,73 @@ function render() {
     board.appendChild(createListElement(list));
   });
 }
+
+const cardModal = document.getElementById("card-modal");
+const cardModalHeading = document.getElementById("card-modal-heading");
+const cardForm = document.getElementById("card-form");
+const cardTitleInput = document.getElementById("card-title-input");
+const cardDescInput = document.getElementById("card-desc-input");
+const cardDueInput = document.getElementById("card-due-input");
+const cardModalCancel = document.getElementById("card-modal-cancel");
+const cardModalSubmit = document.getElementById("card-modal-submit");
+
+let activeListId = null;
+let editingCardId = null;
+
+function openCardModal(listId) {
+  activeListId = listId;
+  editingCardId = null;
+  cardForm.reset();
+  cardModalHeading.textContent = "カードを追加";
+  cardModalSubmit.textContent = "追加";
+  cardModal.classList.remove("hidden");
+  cardModal.setAttribute("aria-hidden", "false");
+  cardTitleInput.focus();
+}
+
+function openEditCardModal(listId, card) {
+  activeListId = listId;
+  editingCardId = card.id;
+  cardForm.reset();
+  cardTitleInput.value = card.title;
+  cardDescInput.value = card.description || "";
+  cardDueInput.value = card.dueDate || "";
+  cardModalHeading.textContent = "カードを編集";
+  cardModalSubmit.textContent = "保存";
+  cardModal.classList.remove("hidden");
+  cardModal.setAttribute("aria-hidden", "false");
+  cardTitleInput.focus();
+}
+
+function closeCardModal() {
+  cardModal.classList.add("hidden");
+  cardModal.setAttribute("aria-hidden", "true");
+  activeListId = null;
+  editingCardId = null;
+}
+
+cardForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!activeListId) return;
+  if (editingCardId) {
+    updateCard(activeListId, editingCardId, cardTitleInput.value, cardDescInput.value, cardDueInput.value);
+  } else {
+    addCard(activeListId, cardTitleInput.value, cardDescInput.value, cardDueInput.value);
+  }
+  closeCardModal();
+});
+
+cardModalCancel.addEventListener("click", () => closeCardModal());
+
+cardModal.addEventListener("click", (e) => {
+  if (e.target === cardModal) closeCardModal();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !cardModal.classList.contains("hidden")) {
+    closeCardModal();
+  }
+});
 
 saveState(state);
 render();
