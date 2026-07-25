@@ -20,9 +20,19 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ## セットアップ
 
+### データベース（PostgreSQL / Docker）
+
+前提: Docker / Docker Compose が必要です。
+
+```sh
+docker compose up -d
+```
+
+デフォルトでは `localhost:5432` にDB名 `taskmanagement`、ユーザー/パスワード `taskmanagement` で起動します（`.env.example` を参考に `.env` を作成すると値を変更できます）。
+
 ### バックエンド（Spring Boot）
 
-前提: Java 25 が必要です（Homebrewの場合 `brew install openjdk@25`）。
+前提: Java 25 が必要です（Homebrewの場合 `brew install openjdk@25`）。上記のPostgreSQLコンテナを先に起動してください。
 
 ```sh
 cd backend
@@ -32,4 +42,4 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home
 
 起動後、`http://localhost:8080/api/health` にアクセスすると `{"status":"ok"}` が返ります。
 
-現時点ではSpring Bootの雛形のみで、PostgreSQL/JPAとの連携は未実装です。
+DB接続先はデフォルトでDocker Composeの設定と一致していますが、環境変数（`DB_HOST` / `DB_PORT` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD`）で上書きできます。
