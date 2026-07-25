@@ -37,16 +37,32 @@ function findList(listId) {
   return state.lists.find((list) => list.id === listId);
 }
 
+function insertCardSorted(list, card) {
+  const insertIndex = list.cards.findIndex(
+    (c) => c.dueDate && c.dueDate > card.dueDate
+  );
+  if (insertIndex === -1) {
+    list.cards.push(card);
+  } else {
+    list.cards.splice(insertIndex, 0, card);
+  }
+}
+
 function addCard(listId, title, description, dueDate) {
   const trimmed = title.trim();
   if (!trimmed) return;
   const list = findList(listId);
-  list.cards.push({
+  const card = {
     id: state.nextId++,
     title: trimmed,
     description: description ? description.trim() : "",
     dueDate: dueDate || null,
-  });
+  };
+  if (card.dueDate) {
+    insertCardSorted(list, card);
+  } else {
+    list.cards.push(card);
+  }
   saveState(state);
   render();
 }
@@ -55,11 +71,16 @@ function updateCard(listId, cardId, title, description, dueDate) {
   const trimmed = title.trim();
   if (!trimmed) return;
   const list = findList(listId);
-  const card = list.cards.find((c) => c.id === cardId);
-  if (!card) return;
+  const index = list.cards.findIndex((c) => c.id === cardId);
+  if (index === -1) return;
+  const card = list.cards[index];
   card.title = trimmed;
   card.description = description ? description.trim() : "";
   card.dueDate = dueDate || null;
+  if (card.dueDate) {
+    list.cards.splice(index, 1);
+    insertCardSorted(list, card);
+  }
   saveState(state);
   render();
 }
@@ -71,22 +92,51 @@ function deleteCard(listId, cardId) {
   render();
 }
 
-function moveCard(cardId, fromListId, toListId) {
-  if (fromListId === toListId) return;
-  const fromList = findList(fromListId);
-  const toList = findList(toListId);
-  const cardIndex = fromList.cards.findIndex((card) => card.id === cardId);
-  if (cardIndex === -1) return;
-  const [card] = fromList.cards.splice(cardIndex, 1);
-  toList.cards.push(card);
+function findCardById(cardId) {
+  for (const list of state.lists) {
+    const card = list.cards.find((c) => c.id === cardId);
+    if (card) return card;
+  }
+  return null;
+}
+
+function reorderFromDOM() {
+  const orderByList = [];
+  document.querySelectorAll(".list").forEach((listEl) => {
+    const cardListEl = listEl.querySelector(".card-list");
+    orderByList.push({
+      listId: listEl.dataset.listId,
+      cardIds: [...cardListEl.children].map((el) => Number(el.dataset.cardId)),
+    });
+  });
+  orderByList.forEach(({ listId, cardIds }) => {
+    const list = findList(listId);
+    list.cards = cardIds.map((cardId) => findCardById(cardId));
+  });
   saveState(state);
   render();
+}
+
+function getDragAfterElement(cardListEl, y) {
+  const cards = [...cardListEl.querySelectorAll(".card:not(.dragging)")];
+  return cards.reduce(
+    (closest, cardEl) => {
+      const box = cardEl.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: cardEl };
+      }
+      return closest;
+    },
+    { offset: Number.NEGATIVE_INFINITY, element: null }
+  ).element;
 }
 
 function createCardElement(listId, card) {
   const cardEl = document.createElement("div");
   cardEl.className = "card";
   cardEl.draggable = true;
+  cardEl.dataset.cardId = String(card.id);
   if (card.description) {
     cardEl.title = card.description;
   }
@@ -109,14 +159,12 @@ function createCardElement(listId, card) {
   });
 
   cardEl.addEventListener("dragstart", (e) => {
-    e.dataTransfer.setData(
-      "text/plain",
-      JSON.stringify({ cardId: card.id, fromListId: listId })
-    );
+    e.dataTransfer.setData("text/plain", String(card.id));
     cardEl.classList.add("dragging");
   });
   cardEl.addEventListener("dragend", () => {
     cardEl.classList.remove("dragging");
+    reorderFromDOM();
   });
 
   const deleteBtn = document.createElement("button");
@@ -132,6 +180,7 @@ function createCardElement(listId, card) {
 function createListElement(list) {
   const listEl = document.createElement("section");
   listEl.className = "list";
+  listEl.dataset.listId = list.id;
 
   const nameEl = document.createElement("h2");
   nameEl.className = "list-name";
@@ -154,17 +203,19 @@ function createListElement(list) {
   listEl.addEventListener("dragover", (e) => {
     e.preventDefault();
     listEl.classList.add("drag-over");
+    const dragging = cardListEl.querySelector(".card.dragging") || document.querySelector(".card.dragging");
+    if (!dragging) return;
+    const afterElement = getDragAfterElement(cardListEl, e.clientY);
+    if (afterElement == null) {
+      cardListEl.appendChild(dragging);
+    } else {
+      cardListEl.insertBefore(dragging, afterElement);
+    }
   });
-  listEl.addEventListener("dragleave", () => {
-    listEl.classList.remove("drag-over");
-  });
-  listEl.addEventListener("drop", (e) => {
-    e.preventDefault();
-    listEl.classList.remove("drag-over");
-    const data = e.dataTransfer.getData("text/plain");
-    if (!data) return;
-    const { cardId, fromListId } = JSON.parse(data);
-    moveCard(cardId, fromListId, list.id);
+  listEl.addEventListener("dragleave", (e) => {
+    if (!listEl.contains(e.relatedTarget)) {
+      listEl.classList.remove("drag-over");
+    }
   });
 
   const addCardEl = document.createElement("div");
