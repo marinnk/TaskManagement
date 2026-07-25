@@ -43,3 +43,7 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home
 起動後、`http://localhost:8080/api/health` にアクセスすると `{"status":"ok"}` が返ります。
 
 DB接続先はデフォルトでDocker Composeの設定と一致していますが、環境変数（`DB_HOST` / `DB_PORT` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD`）で上書きできます。
+
+## 開発フロー
+
+Issueを起票 → Issueに対応するブランチを作成 → PRを作成してmainにマージ、という流れで開発します。mainブランチへの直接pushは禁止されています。詳細は [CLAUDE.md](CLAUDE.md) を参照してください。
