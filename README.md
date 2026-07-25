@@ -10,10 +10,9 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ## 使用技術
 
-- Java / Spring Boot
-- Thymeleaf
-- H2 Database
-- JavaScript（ドラッグ&ドロップ操作）
+- Java / Spring Boot（Gradle）
+- React（TypeScript）+ Vite
+- PostgreSQL
 
 ## ステータス
 
