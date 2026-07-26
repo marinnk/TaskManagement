@@ -12,29 +12,23 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ### バックエンド
 
-| 技術                    | バージョン  |
-|-------------------------|-------------|
-| Java                    | 25          |
-| Spring Boot             | 4.1.0       |
-| Spring Data JPA         | 4.1.0       |
-| Hibernate               | 7.4.1.Final |
-| Gradle                  | 9.5.1       |
-| PostgreSQL JDBCドライバ | 42.7.11     |
+- 言語：Java 25
+- フレームワーク：Spring Boot 4.1.0
+- データアクセス：Spring Data JPA 4.1.0
+- ORM：Hibernate 7.4.1.Final
+- ビルドツール：Gradle 9.5.1
+- JDBCドライバ：PostgreSQL JDBCドライバ 42.7.11
 
 ### フロントエンド
 
-| 技術       | バージョン                |
-|------------|---------------------------|
-| Node.js    | ^20.19.0 または >=22.12.0 |
-| React      | 19.2.8                    |
-| TypeScript | 6.0.3                     |
-| Vite       | 8.1.5                     |
+- 言語：TypeScript 6.0.3
+- ライブラリ：React 19.2.8
+- ビルドツール：Vite 8.1.5
+- ランタイム：Node.js ^20.19.0 または >=22.12.0
 
 ### データベース
 
-| 技術       | バージョン                 |
-|------------|----------------------------|
-| PostgreSQL | 16（`postgres:16-alpine`） |
+- DBMS：PostgreSQL 16（`postgres:16-alpine`）
 
 バージョンの詳細・更新方針は [非機能要件・技術スタック](docs/non-functional-requirements.md) を参照してください。
 
