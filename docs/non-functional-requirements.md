@@ -4,22 +4,35 @@
 
 ## 技術スタック
 
-| レイヤー       | 技術                    | バージョン                                 |
-|----------------|-------------------------|--------------------------------------------|
-| バックエンド   | Java                    | 25                                         |
-| バックエンド   | Spring Boot             | 4.1.0                                      |
-| バックエンド   | Spring Data JPA         | 4.1.0                                      |
-| バックエンド   | Hibernate               | 7.4.1.Final                                |
-| バックエンド   | Gradle                  | 9.5.1                                      |
-| バックエンド   | PostgreSQL JDBCドライバ | 42.7.11                                    |
-| フロントエンド | Node.js                 | ^20.19.0 または >=22.12.0                  |
-| フロントエンド | React                   | 19.2.8                                     |
-| フロントエンド | TypeScript              | 6.0.3                                      |
-| フロントエンド | Vite                    | 8.1.5                                      |
-| データベース   | PostgreSQL              | 16（Dockerイメージ: `postgres:16-alpine`） |
+### バックエンド
+
+| 技術                    | バージョン  |
+|-------------------------|-------------|
+| Java                    | 25          |
+| Spring Boot             | 4.1.0       |
+| Spring Data JPA         | 4.1.0       |
+| Hibernate               | 7.4.1.Final |
+| Gradle                  | 9.5.1       |
+| PostgreSQL JDBCドライバ | 42.7.11     |
 
 - API連携：Spring Web（REST API）+ Spring Data JPA（Hibernate）
+
+### フロントエンド
+
+| 技術       | バージョン                |
+|------------|---------------------------|
+| Node.js    | ^20.19.0 または >=22.12.0 |
+| React      | 19.2.8                    |
+| TypeScript | 6.0.3                     |
+| Vite       | 8.1.5                     |
+
 - Next.jsは対象外
+
+### データベース
+
+| 技術       | バージョン                                 |
+|------------|--------------------------------------------|
+| PostgreSQL | 16（Dockerイメージ: `postgres:16-alpine`） |
 
 > バージョンは `backend/build.gradle` / `backend/gradle/wrapper/gradle-wrapper.properties` / `frontend/package-lock.json` / `docker-compose.yml` を実態の一次情報とする。更新時はこれらのファイルとあわせて本節も更新すること。
 
