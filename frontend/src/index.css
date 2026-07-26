@@ -155,6 +155,17 @@ body {
   color: #172b4d;
 }
 
+.modal-hint {
+  margin: -4px 0 0;
+  font-size: 0.75rem;
+  color: #5e6c84;
+}
+
+.required-mark {
+  color: #eb5a46;
+  margin-left: 2px;
+}
+
 .modal-field {
   display: flex;
   flex-direction: column;

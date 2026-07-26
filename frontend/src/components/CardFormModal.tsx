@@ -32,9 +32,12 @@ export function CardFormModal({ onCancel, onSubmit }: CardFormModalProps) {
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">カードを追加</h2>
+        <p className="modal-hint">※は必須項目です</p>
 
         <label className="modal-field">
-          <span>タイトル</span>
+          <span>
+            タイトル<span className="required-mark">※</span>
+          </span>
           <input
             type="text"
             value={title}
