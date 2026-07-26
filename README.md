@@ -44,6 +44,18 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home
 
 DB接続先はデフォルトでDocker Composeの設定と一致していますが、環境変数（`DB_HOST` / `DB_PORT` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD`）で上書きできます。
 
+### フロントエンド（React + Vite）
+
+前提: Node.js が必要です。上記のバックエンドを先に起動してください。
+
+```sh
+cd frontend
+npm install
+npm run dev
+```
+
+起動後、`http://localhost:5173` にアクセスするとボード画面が表示されます。APIの接続先はデフォルトで `http://localhost:8080` です（`frontend/.env.example` を参考に `.env.development` を上書きすると変更できます）。
+
 ## 開発フロー
 
 Issueを起票 → Issueに対応するブランチを作成 → PRを作成してmainにマージ、という流れで開発します。mainブランチへの直接pushは禁止されています。詳細は [CLAUDE.md](CLAUDE.md) を参照してください。
