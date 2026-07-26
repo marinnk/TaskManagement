@@ -4,10 +4,30 @@
 
 ## 技術スタック
 
-- バックエンド：Java / Spring Boot（ビルドツール：Gradle）
-- フロントエンド：React（TypeScript）+ Vite（Next.jsは対象外）
-- データベース：PostgreSQL
-- API連携：Spring Web（REST API）+ Spring Data JPA（Hibernate）
+### バックエンド
+
+- 言語：Java 25
+- フレームワーク：Spring Boot 4.1.0
+- Web：Spring Web（REST API）
+- データアクセス：Spring Data JPA 4.1.0
+- ORM：Hibernate 7.4.1.Final
+- ビルドツール：Gradle 9.5.1
+- JDBCドライバ：PostgreSQL JDBCドライバ 42.7.11
+
+### フロントエンド
+
+- 言語：TypeScript 6.0.3
+- ライブラリ：React 19.2.8
+- ビルドツール：Vite 8.1.5
+- ランタイム：Node.js ^20.19.0 または >=22.12.0
+
+（Next.jsは対象外）
+
+### データベース
+
+- DBMS：PostgreSQL 16（Dockerイメージ: `postgres:16-alpine`）
+
+> バージョンは `backend/build.gradle` / `backend/gradle/wrapper/gradle-wrapper.properties` / `frontend/package-lock.json` / `docker-compose.yml` を実態の一次情報とする。更新時はこれらのファイルとあわせて本節も更新すること。
 
 ## 非機能要件
 

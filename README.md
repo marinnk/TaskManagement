@@ -10,17 +10,46 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ## 使用技術
 
-- Java / Spring Boot（Gradle）
-- React（TypeScript）+ Vite
-- PostgreSQL
+### バックエンド
+
+- 言語：Java 25
+- フレームワーク：Spring Boot 4.1.0
+- データアクセス：Spring Data JPA 4.1.0
+- ORM：Hibernate 7.4.1.Final
+- ビルドツール：Gradle 9.5.1
+- JDBCドライバ：PostgreSQL JDBCドライバ 42.7.11
+
+### フロントエンド
+
+- 言語：TypeScript 6.0.3
+- ライブラリ：React 19.2.8
+- ビルドツール：Vite 8.1.5
+- ランタイム：Node.js ^20.19.0 または >=22.12.0
+
+### データベース
+
+- DBMS：PostgreSQL 16（`postgres:16-alpine`）
+
+バージョンの詳細・更新方針は [非機能要件・技術スタック](docs/non-functional-requirements.md) を参照してください。
+
+## プロジェクト構成
+
+```
+.
+├── backend/    # Spring Boot（REST API）
+├── frontend/   # React + Vite（画面）
+├── docs/       # 要件定義・設計ドキュメント
+├── mockup/     # 画面モックアップ
+└── docker-compose.yml  # PostgreSQL起動用
+```
 
 ## ステータス
 
-現在、要件定義を完了し、設計・実装に着手する段階です。
+現在、ボード詳細取得API（読み取り専用）とフロントエンドのボード画面表示まで実装済みです。カードの追加・編集・削除・ドラッグ&ドロップ等は今後実装予定です。詳細は [機能要件](docs/functional-requirements.md) を参照してください。
 
 ## セットアップ
 
-### データベース（PostgreSQL / Docker）
+### PostgreSQL（Docker）の起動
 
 前提: Docker / Docker Compose が必要です。
 
@@ -55,6 +84,50 @@ npm run dev
 ```
 
 起動後、`http://localhost:5173` にアクセスするとボード画面が表示されます。APIの接続先はデフォルトで `http://localhost:8080` です（`frontend/.env.example` を参考に `.env.development` を上書きすると変更できます）。
+
+## API
+
+現在実装済みの主なエンドポイントです。
+
+### ヘルスチェック
+
+- `[GET] /api/health`  
+  ヘルスチェック
+
+### ボード
+
+- `[GET] /api/boards`  
+  ボード一覧取得
+- `[GET] /api/boards/{id}`  
+  ボード詳細（リスト・カードを含む）取得
+
+## テスト
+
+```sh
+cd backend
+export JAVA_HOME=/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home
+./gradlew test
+```
+
+フロントエンドは以下でLintを実行できます。
+
+```sh
+cd frontend
+npm run lint
+```
+
+## 関連ドキュメント
+
+- [要件定義書](docs/requirements.md)  
+  概要・目的・関連ドキュメントへのリンク集
+- [機能要件](docs/functional-requirements.md)  
+  提供する機能一覧とユースケース
+- [画面設計](docs/screen-design.md)  
+  画面一覧とワイヤーフレーム
+- [データ要件](docs/data-requirements.md)  
+  エンティティ・テーブル定義・ER図
+- [非機能要件](docs/non-functional-requirements.md)  
+  技術スタックのバージョン、性能・セキュリティ等
 
 ## 開発フロー
 
