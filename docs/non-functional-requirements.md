@@ -4,19 +4,19 @@
 
 ## 技術スタック
 
-| レイヤー | 技術 | バージョン |
-|---|---|---|
-| バックエンド | Java | 25 |
-| バックエンド | Spring Boot | 4.1.0 |
-| バックエンド | Spring Data JPA | 4.1.0 |
-| バックエンド | Hibernate | 7.4.1.Final |
-| バックエンド | Gradle | 9.5.1 |
-| バックエンド | PostgreSQL JDBCドライバ | 42.7.11 |
-| フロントエンド | Node.js | ^20.19.0 または >=22.12.0 |
-| フロントエンド | React | 19.2.8 |
-| フロントエンド | TypeScript | 6.0.3 |
-| フロントエンド | Vite | 8.1.5 |
-| データベース | PostgreSQL | 16（Dockerイメージ: `postgres:16-alpine`） |
+| レイヤー       | 技術                    | バージョン                                 |
+|----------------|-------------------------|--------------------------------------------|
+| バックエンド   | Java                    | 25                                         |
+| バックエンド   | Spring Boot             | 4.1.0                                      |
+| バックエンド   | Spring Data JPA         | 4.1.0                                      |
+| バックエンド   | Hibernate               | 7.4.1.Final                                |
+| バックエンド   | Gradle                  | 9.5.1                                      |
+| バックエンド   | PostgreSQL JDBCドライバ | 42.7.11                                    |
+| フロントエンド | Node.js                 | ^20.19.0 または >=22.12.0                  |
+| フロントエンド | React                   | 19.2.8                                     |
+| フロントエンド | TypeScript              | 6.0.3                                      |
+| フロントエンド | Vite                    | 8.1.5                                      |
+| データベース   | PostgreSQL              | 16（Dockerイメージ: `postgres:16-alpine`） |
 
 - API連携：Spring Web（REST API）+ Spring Data JPA（Hibernate）
 - Next.jsは対象外
