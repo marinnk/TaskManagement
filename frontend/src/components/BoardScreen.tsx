@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getBoardDetail, getBoards } from '../api/boards';
-import type { BoardDetailDto } from '../types/board';
+import { createCard } from '../api/cards';
+import type { BoardDetailDto, CardCreateRequest } from '../types/board';
 import { List } from './List';
 
 type Status = 'loading' | 'error' | 'empty' | 'ready';
@@ -8,6 +9,7 @@ type Status = 'loading' | 'error' | 'empty' | 'ready';
 export function BoardScreen() {
   const [board, setBoard] = useState<BoardDetailDto | null>(null);
   const [status, setStatus] = useState<Status>('loading');
+  const [addCardError, setAddCardError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,14 +50,27 @@ export function BoardScreen() {
 
   const lists = [...board.lists].sort((a, b) => a.displayOrder - b.displayOrder);
 
+  const handleAddCard = async (listId: number, payload: CardCreateRequest) => {
+    setAddCardError(null);
+    try {
+      await createCard(listId, payload);
+      const detail = await getBoardDetail(board.id);
+      setBoard(detail);
+    } catch (error) {
+      console.error(error);
+      setAddCardError('カードの追加に失敗しました');
+    }
+  };
+
   return (
     <>
       <header className="board-header">
         <h1 className="board-name">{board.name}</h1>
       </header>
+      {addCardError && <p className="board-message board-message-error">{addCardError}</p>}
       <main className="board">
         {lists.map((list) => (
-          <List key={list.id} list={list} />
+          <List key={list.id} list={list} onAddCard={handleAddCard} />
         ))}
       </main>
     </>

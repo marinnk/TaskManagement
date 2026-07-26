@@ -23,3 +23,9 @@ export interface BoardDetailDto {
   name: string;
   lists: TaskListDto[];
 }
+
+export interface CardCreateRequest {
+  title: string;
+  description: string | null;
+  dueDate: string | null;
+}
