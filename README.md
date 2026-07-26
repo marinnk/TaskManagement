@@ -10,31 +10,19 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ## 使用技術
 
-### バックエンド
-
-| 技術 | バージョン |
-|---|---|
-| Java | 25 |
-| Spring Boot | 4.1.0 |
-| Spring Data JPA | 4.1.0 |
-| Hibernate | 7.4.1.Final |
-| Gradle | 9.5.1 |
-| PostgreSQL JDBCドライバ | 42.7.11 |
-
-### フロントエンド
-
-| 技術 | バージョン |
-|---|---|
-| Node.js | ^20.19.0 または >=22.12.0 |
-| React | 19.2.8 |
-| TypeScript | 6.0.3 |
-| Vite | 8.1.5 |
-
-### データベース
-
-| 技術 | バージョン |
-|---|---|
-| PostgreSQL | 16（`postgres:16-alpine`） |
+| レイヤー | 技術 | バージョン |
+|---|---|---|
+| バックエンド | Java | 25 |
+| バックエンド | Spring Boot | 4.1.0 |
+| バックエンド | Spring Data JPA | 4.1.0 |
+| バックエンド | Hibernate | 7.4.1.Final |
+| バックエンド | Gradle | 9.5.1 |
+| バックエンド | PostgreSQL JDBCドライバ | 42.7.11 |
+| フロントエンド | Node.js | ^20.19.0 または >=22.12.0 |
+| フロントエンド | React | 19.2.8 |
+| フロントエンド | TypeScript | 6.0.3 |
+| フロントエンド | Vite | 8.1.5 |
+| データベース | PostgreSQL | 16（`postgres:16-alpine`） |
 
 バージョンの詳細・更新方針は [非機能要件・技術スタック](docs/non-functional-requirements.md) を参照してください。
 
@@ -55,7 +43,7 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ## セットアップ
 
-### データベース（PostgreSQL / Docker）
+### PostgreSQL（Docker）の起動
 
 前提: Docker / Docker Compose が必要です。
 
