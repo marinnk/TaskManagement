@@ -1,0 +1,80 @@
+package com.taskmanagement.backend.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+class CardControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void createCard_withDueDate_isInsertedInAscendingDueDateOrder() throws Exception {
+        mockMvc.perform(post("/api/lists/1/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":"新しいタスク","description":null,"dueDate":"2026-07-25"}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("新しいタスク"))
+                .andExpect(jsonPath("$.displayOrder").value(0));
+
+        mockMvc.perform(get("/api/boards/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lists[0].cards[0].title").value("新しいタスク"))
+                .andExpect(jsonPath("$.lists[0].cards[1].title").value("要件定義書を作成する"))
+                .andExpect(jsonPath("$.lists[0].cards[2].title").value("DB設計をレビューする"));
+    }
+
+    @Test
+    void createCard_withoutDueDate_isAppendedToEnd() throws Exception {
+        mockMvc.perform(post("/api/lists/1/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":"メモ","description":null,"dueDate":null}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("メモ"))
+                .andExpect(jsonPath("$.displayOrder").value(2));
+
+        mockMvc.perform(get("/api/boards/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lists[0].cards[2].title").value("メモ"));
+    }
+
+    @Test
+    void createCard_withBlankTitle_returns400() throws Exception {
+        mockMvc.perform(post("/api/lists/1/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":"  ","description":null,"dueDate":null}
+                                """))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/api/boards/1"))
+                .andExpect(jsonPath("$.lists[0].cards.length()").value(2));
+    }
+
+    @Test
+    void createCard_withUnknownListId_returns404() throws Exception {
+        mockMvc.perform(post("/api/lists/9999/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":"新しいタスク","description":null,"dueDate":null}
+                                """))
+                .andExpect(status().isNotFound());
+    }
+}
