@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getBoardDetail, getBoards } from '../api/boards';
-import { createCard, updateCard } from '../api/cards';
-import type { BoardDetailDto, CardCreateRequest } from '../types/board';
+import { createCard, moveCard, updateCard } from '../api/cards';
+import type { BoardDetailDto, CardCreateRequest, CardMoveRequest } from '../types/board';
 import { List } from './List';
 
 type Status = 'loading' | 'error' | 'empty' | 'ready';
@@ -74,6 +74,18 @@ export function BoardScreen() {
     }
   };
 
+  const handleMoveCard = async (cardId: number, payload: CardMoveRequest) => {
+    setCardError(null);
+    try {
+      await moveCard(cardId, payload);
+      const detail = await getBoardDetail(board.id);
+      setBoard(detail);
+    } catch (error) {
+      console.error(error);
+      setCardError('カードの移動に失敗しました');
+    }
+  };
+
   return (
     <>
       <header className="board-header">
@@ -87,6 +99,7 @@ export function BoardScreen() {
             list={list}
             onAddCard={handleAddCard}
             onUpdateCard={handleUpdateCard}
+            onMoveCard={handleMoveCard}
           />
         ))}
       </main>

@@ -65,6 +65,12 @@ body {
   gap: 6px;
   overflow-y: auto;
   min-height: 8px;
+  flex: 1;
+}
+
+.card-list-drag-over {
+  background: rgba(9, 30, 66, 0.08);
+  border-radius: 4px;
 }
 
 .card {
@@ -74,6 +80,11 @@ body {
   box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
   font-size: 0.9rem;
   word-break: break-word;
+  cursor: grab;
+}
+
+.card-dragging {
+  opacity: 0.4;
 }
 
 .card-title {

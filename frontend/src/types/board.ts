@@ -29,3 +29,8 @@ export interface CardCreateRequest {
   description: string | null;
   dueDate: string | null;
 }
+
+export interface CardMoveRequest {
+  listId: number;
+  position: number;
+}

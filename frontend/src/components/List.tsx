@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { CardCreateRequest, CardDto, TaskListDto } from '../types/board';
+import type { CardCreateRequest, CardDto, CardMoveRequest, TaskListDto } from '../types/board';
 import { Card } from './Card';
 import { CardFormModal } from './CardFormModal';
 
@@ -9,10 +9,27 @@ interface ListProps {
   list: TaskListDto;
   onAddCard: (listId: number, payload: CardCreateRequest) => Promise<void>;
   onUpdateCard: (listId: number, cardId: number, payload: CardCreateRequest) => Promise<void>;
+  onMoveCard: (cardId: number, payload: CardMoveRequest) => Promise<void>;
 }
 
-export function List({ list, onAddCard, onUpdateCard }: ListProps) {
+function computeDropIndex(container: HTMLElement, clientY: number, draggingCardId: number): number {
+  let index = 0;
+  for (const child of Array.from(container.children) as HTMLElement[]) {
+    const childCardId = Number(child.dataset.cardId);
+    if (childCardId === draggingCardId) continue;
+    const rect = child.getBoundingClientRect();
+    if (clientY > rect.top + rect.height / 2) {
+      index++;
+    } else {
+      break;
+    }
+  }
+  return index;
+}
+
+export function List({ list, onAddCard, onUpdateCard, onMoveCard }: ListProps) {
   const [modalState, setModalState] = useState<ModalState>({ mode: 'closed' });
+  const [isDragOver, setIsDragOver] = useState(false);
   const cards = [...list.cards].sort((a, b) => a.displayOrder - b.displayOrder);
 
   const handleSubmit = async (payload: CardCreateRequest) => {
@@ -30,7 +47,22 @@ export function List({ list, onAddCard, onUpdateCard }: ListProps) {
         {list.name}
         <span className="list-count">{cards.length}</span>
       </div>
-      <div className="card-list">
+      <div
+        className={`card-list${isDragOver ? ' card-list-drag-over' : ''}`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragOver(true);
+        }}
+        onDragLeave={() => setIsDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragOver(false);
+          const cardId = Number(e.dataTransfer.getData('text/plain'));
+          if (!cardId) return;
+          const position = computeDropIndex(e.currentTarget, e.clientY, cardId);
+          onMoveCard(cardId, { listId: list.id, position });
+        }}
+      >
         {cards.map((card) => (
           <Card
             key={card.id}
