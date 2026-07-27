@@ -67,6 +67,7 @@ export function List({
           e.preventDefault();
           setDragOverIndex(null);
           const cardId = Number(e.dataTransfer.getData('text/plain'));
+          onDragStateChange(null);
           if (!cardId) return;
           const position = computeDropIndex(e.currentTarget, e.clientY);
           onMoveCard(cardId, { listId: list.id, position });
