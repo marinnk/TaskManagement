@@ -10,6 +10,7 @@ export function BoardScreen() {
   const [board, setBoard] = useState<BoardDetailDto | null>(null);
   const [status, setStatus] = useState<Status>('loading');
   const [cardError, setCardError] = useState<string | null>(null);
+  const [draggingCardId, setDraggingCardId] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -100,6 +101,8 @@ export function BoardScreen() {
             onAddCard={handleAddCard}
             onUpdateCard={handleUpdateCard}
             onMoveCard={handleMoveCard}
+            draggingCardId={draggingCardId}
+            onDragStateChange={setDraggingCardId}
           />
         ))}
       </main>

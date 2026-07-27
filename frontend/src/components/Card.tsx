@@ -4,9 +4,11 @@ import type { CardDto } from '../types/board';
 interface CardProps {
   card: CardDto;
   onDoubleClick: (card: CardDto) => void;
+  onDragStart: (card: CardDto) => void;
+  onDragEnd: () => void;
 }
 
-export function Card({ card, onDoubleClick }: CardProps) {
+export function Card({ card, onDoubleClick, onDragStart, onDragEnd }: CardProps) {
   const [isDragging, setIsDragging] = useState(false);
 
   return (
@@ -18,8 +20,12 @@ export function Card({ card, onDoubleClick }: CardProps) {
         e.dataTransfer.setData('text/plain', String(card.id));
         e.dataTransfer.effectAllowed = 'move';
         setIsDragging(true);
+        onDragStart(card);
       }}
-      onDragEnd={() => setIsDragging(false)}
+      onDragEnd={() => {
+        setIsDragging(false);
+        onDragEnd();
+      }}
       onDoubleClick={() => onDoubleClick(card)}
     >
       <div className="card-title">{card.title}</div>

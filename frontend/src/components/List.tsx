@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { CardCreateRequest, CardDto, CardMoveRequest, TaskListDto } from '../types/board';
 import { Card } from './Card';
 import { CardFormModal } from './CardFormModal';
@@ -10,6 +10,8 @@ interface ListProps {
   onAddCard: (listId: number, payload: CardCreateRequest) => Promise<void>;
   onUpdateCard: (listId: number, cardId: number, payload: CardCreateRequest) => Promise<void>;
   onMoveCard: (cardId: number, payload: CardMoveRequest) => Promise<void>;
+  draggingCardId: number | null;
+  onDragStateChange: (cardId: number | null) => void;
 }
 
 function computeDropIndex(container: HTMLElement, clientY: number, draggingCardId: number): number {
@@ -27,9 +29,16 @@ function computeDropIndex(container: HTMLElement, clientY: number, draggingCardI
   return index;
 }
 
-export function List({ list, onAddCard, onUpdateCard, onMoveCard }: ListProps) {
+export function List({
+  list,
+  onAddCard,
+  onUpdateCard,
+  onMoveCard,
+  draggingCardId,
+  onDragStateChange,
+}: ListProps) {
   const [modalState, setModalState] = useState<ModalState>({ mode: 'closed' });
-  const [isDragOver, setIsDragOver] = useState(false);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const cards = [...list.cards].sort((a, b) => a.displayOrder - b.displayOrder);
 
   const handleSubmit = async (payload: CardCreateRequest) => {
@@ -48,28 +57,33 @@ export function List({ list, onAddCard, onUpdateCard, onMoveCard }: ListProps) {
         <span className="list-count">{cards.length}</span>
       </div>
       <div
-        className={`card-list${isDragOver ? ' card-list-drag-over' : ''}`}
+        className="card-list"
         onDragOver={(e) => {
           e.preventDefault();
-          setIsDragOver(true);
+          setDragOverIndex(computeDropIndex(e.currentTarget, e.clientY, draggingCardId ?? -1));
         }}
-        onDragLeave={() => setIsDragOver(false)}
+        onDragLeave={() => setDragOverIndex(null)}
         onDrop={(e) => {
           e.preventDefault();
-          setIsDragOver(false);
+          setDragOverIndex(null);
           const cardId = Number(e.dataTransfer.getData('text/plain'));
           if (!cardId) return;
           const position = computeDropIndex(e.currentTarget, e.clientY, cardId);
           onMoveCard(cardId, { listId: list.id, position });
         }}
       >
-        {cards.map((card) => (
-          <Card
-            key={card.id}
-            card={card}
-            onDoubleClick={(c) => setModalState({ mode: 'edit', card: c })}
-          />
+        {cards.map((card, index) => (
+          <Fragment key={card.id}>
+            {dragOverIndex === index && <div className="card-drop-placeholder" />}
+            <Card
+              card={card}
+              onDoubleClick={(c) => setModalState({ mode: 'edit', card: c })}
+              onDragStart={(c) => onDragStateChange(c.id)}
+              onDragEnd={() => onDragStateChange(null)}
+            />
+          </Fragment>
         ))}
+        {dragOverIndex === cards.length && <div className="card-drop-placeholder" />}
       </div>
       <button
         type="button"
