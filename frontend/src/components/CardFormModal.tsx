@@ -63,6 +63,12 @@ export function CardFormModal({ initialValues, onCancel, onSubmit }: CardFormMod
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Delete' || e.key === 'Backspace') {
+                e.preventDefault();
+                setDueDate('');
+              }
+            }}
           />
         </label>
 
