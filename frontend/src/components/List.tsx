@@ -14,10 +14,13 @@ interface ListProps {
   onDragStateChange: (cardId: number | null) => void;
 }
 
-function computeDropIndex(container: HTMLElement, clientY: number): number {
+// 「ドラッグ中のカード自身」を除いた、他のカードだけを数えた挿入先index。
+// バックエンドのCardCommandService#moveCardが期待する「自分以外のカードの中での位置」と同じ意味。
+function computeDropIndex(container: HTMLElement, clientY: number, draggingCardId: number): number {
   let index = 0;
   const cardElements = container.querySelectorAll<HTMLElement>(':scope > .card');
   for (const child of Array.from(cardElements)) {
+    if (Number(child.dataset.cardId) === draggingCardId) continue;
     const rect = child.getBoundingClientRect();
     if (clientY > rect.top + rect.height / 2) {
       index++;
@@ -39,7 +42,15 @@ export function List({
   const [modalState, setModalState] = useState<ModalState>({ mode: 'closed' });
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const cards = [...list.cards].sort((a, b) => a.displayOrder - b.displayOrder);
-  const visibleCards = cards.filter((card) => card.id !== draggingCardId);
+
+  // ドラッグ中のカードは薄く表示したままこのリストに残す。
+  // プレースホルダーは「自分以外のカードの中での位置」を、ドラッグ中のカード自身が
+  // 含まれた完全な配列上のindexに変換した位置に表示する。
+  const draggingCardIndex = cards.findIndex((card) => card.id === draggingCardId);
+  const toFullIndex = (otherCardsIndex: number) =>
+    draggingCardIndex === -1 || otherCardsIndex <= draggingCardIndex
+      ? otherCardsIndex
+      : otherCardsIndex + 1;
 
   const handleSubmit = async (payload: CardCreateRequest) => {
     if (modalState.mode === 'edit') {
@@ -60,7 +71,8 @@ export function List({
         className="card-list"
         onDragOver={(e) => {
           e.preventDefault();
-          setDragOverIndex(computeDropIndex(e.currentTarget, e.clientY));
+          const otherCardsIndex = computeDropIndex(e.currentTarget, e.clientY, draggingCardId ?? -1);
+          setDragOverIndex(toFullIndex(otherCardsIndex));
         }}
         onDragLeave={() => setDragOverIndex(null)}
         onDrop={(e) => {
@@ -69,22 +81,23 @@ export function List({
           const cardId = Number(e.dataTransfer.getData('text/plain'));
           onDragStateChange(null);
           if (!cardId) return;
-          const position = computeDropIndex(e.currentTarget, e.clientY);
+          const position = computeDropIndex(e.currentTarget, e.clientY, cardId);
           onMoveCard(cardId, { listId: list.id, position });
         }}
       >
-        {visibleCards.map((card, index) => (
+        {cards.map((card, index) => (
           <Fragment key={card.id}>
             {dragOverIndex === index && <div className="card-drop-placeholder" />}
             <Card
               card={card}
+              isDragging={card.id === draggingCardId}
               onDoubleClick={(c) => setModalState({ mode: 'edit', card: c })}
               onDragStart={(c) => onDragStateChange(c.id)}
               onDragEnd={() => onDragStateChange(null)}
             />
           </Fragment>
         ))}
-        {dragOverIndex === visibleCards.length && <div className="card-drop-placeholder" />}
+        {dragOverIndex === cards.length && <div className="card-drop-placeholder" />}
       </div>
       <button
         type="button"

@@ -2,15 +2,16 @@ import type { CardDto } from '../types/board';
 
 interface CardProps {
   card: CardDto;
+  isDragging: boolean;
   onDoubleClick: (card: CardDto) => void;
   onDragStart: (card: CardDto) => void;
   onDragEnd: () => void;
 }
 
-export function Card({ card, onDoubleClick, onDragStart, onDragEnd }: CardProps) {
+export function Card({ card, isDragging, onDoubleClick, onDragStart, onDragEnd }: CardProps) {
   return (
     <div
-      className="card"
+      className={`card${isDragging ? ' card-dragging' : ''}`}
       data-card-id={card.id}
       draggable
       onDragStart={(e) => {
