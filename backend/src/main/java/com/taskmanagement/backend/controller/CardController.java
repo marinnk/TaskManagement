@@ -3,6 +3,7 @@ package com.taskmanagement.backend.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,5 +27,13 @@ public class CardController {
     @ResponseStatus(HttpStatus.CREATED)
     public CardResponse createCard(@PathVariable Long listId, @RequestBody CardCreateRequest request) {
         return cardCommandService.createCard(listId, request);
+    }
+
+    @PutMapping("/{cardId}")
+    public CardResponse updateCard(
+            @PathVariable Long listId,
+            @PathVariable Long cardId,
+            @RequestBody CardCreateRequest request) {
+        return cardCommandService.updateCard(listId, cardId, request);
     }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getBoardDetail, getBoards } from '../api/boards';
-import { createCard } from '../api/cards';
+import { createCard, updateCard } from '../api/cards';
 import type { BoardDetailDto, CardCreateRequest } from '../types/board';
 import { List } from './List';
 
@@ -9,7 +9,7 @@ type Status = 'loading' | 'error' | 'empty' | 'ready';
 export function BoardScreen() {
   const [board, setBoard] = useState<BoardDetailDto | null>(null);
   const [status, setStatus] = useState<Status>('loading');
-  const [addCardError, setAddCardError] = useState<string | null>(null);
+  const [cardError, setCardError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,14 +51,26 @@ export function BoardScreen() {
   const lists = [...board.lists].sort((a, b) => a.displayOrder - b.displayOrder);
 
   const handleAddCard = async (listId: number, payload: CardCreateRequest) => {
-    setAddCardError(null);
+    setCardError(null);
     try {
       await createCard(listId, payload);
       const detail = await getBoardDetail(board.id);
       setBoard(detail);
     } catch (error) {
       console.error(error);
-      setAddCardError('カードの追加に失敗しました');
+      setCardError('カードの追加に失敗しました');
+    }
+  };
+
+  const handleUpdateCard = async (listId: number, cardId: number, payload: CardCreateRequest) => {
+    setCardError(null);
+    try {
+      await updateCard(listId, cardId, payload);
+      const detail = await getBoardDetail(board.id);
+      setBoard(detail);
+    } catch (error) {
+      console.error(error);
+      setCardError('カードの更新に失敗しました');
     }
   };
 
@@ -67,10 +79,15 @@ export function BoardScreen() {
       <header className="board-header">
         <h1 className="board-name">{board.name}</h1>
       </header>
-      {addCardError && <p className="board-message board-message-error">{addCardError}</p>}
+      {cardError && <p className="board-message board-message-error">{cardError}</p>}
       <main className="board">
         {lists.map((list) => (
-          <List key={list.id} list={list} onAddCard={handleAddCard} />
+          <List
+            key={list.id}
+            list={list}
+            onAddCard={handleAddCard}
+            onUpdateCard={handleUpdateCard}
+          />
         ))}
       </main>
     </>
