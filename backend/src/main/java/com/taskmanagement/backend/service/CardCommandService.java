@@ -3,6 +3,7 @@ package com.taskmanagement.backend.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,52 @@ public class CardCommandService {
                 newCard.getDescription(),
                 newCard.getDueDate(),
                 newCard.getDisplayOrder());
+    }
+
+    @Transactional
+    public CardResponse updateCard(Long listId, Long cardId, CardCreateRequest request) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "card not found: id=" + cardId));
+        if (!card.getList().getId().equals(listId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "card not found: id=" + cardId + " in list=" + listId);
+        }
+
+        String title = request.title() == null ? "" : request.title().trim();
+        if (title.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "title must not be blank");
+        }
+
+        boolean dueDateChanged = !Objects.equals(card.getDueDate(), request.dueDate());
+
+        card.setTitle(title);
+        card.setDescription(request.description());
+        card.setDueDate(request.dueDate());
+
+        if (dueDateChanged) {
+            List<Card> existingCards = new ArrayList<>();
+            for (Card c : cardRepository.findByListIdOrderByDisplayOrderAsc(listId)) {
+                if (!c.getId().equals(cardId)) {
+                    existingCards.add(c);
+                }
+            }
+            List<Card> reordered = insertInOrder(existingCards, card);
+
+            for (int i = 0; i < reordered.size(); i++) {
+                reordered.get(i).setDisplayOrder(i);
+            }
+            cardRepository.saveAll(reordered);
+        } else {
+            cardRepository.save(card);
+        }
+
+        return new CardResponse(
+                card.getId(),
+                card.getTitle(),
+                card.getDescription(),
+                card.getDueDate(),
+                card.getDisplayOrder());
     }
 
     /**

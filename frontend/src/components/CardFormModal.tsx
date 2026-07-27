@@ -2,14 +2,16 @@ import { useState } from 'react';
 import type { CardCreateRequest } from '../types/board';
 
 interface CardFormModalProps {
+  initialValues?: CardCreateRequest;
   onCancel: () => void;
   onSubmit: (payload: CardCreateRequest) => Promise<void>;
 }
 
-export function CardFormModal({ onCancel, onSubmit }: CardFormModalProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
+export function CardFormModal({ initialValues, onCancel, onSubmit }: CardFormModalProps) {
+  const isEditMode = initialValues !== undefined;
+  const [title, setTitle] = useState(initialValues?.title ?? '');
+  const [description, setDescription] = useState(initialValues?.description ?? '');
+  const [dueDate, setDueDate] = useState(initialValues?.dueDate ?? '');
   const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = title.trim().length > 0 && !submitting;
@@ -31,7 +33,7 @@ export function CardFormModal({ onCancel, onSubmit }: CardFormModalProps) {
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">カードを追加</h2>
+        <h2 className="modal-title">{isEditMode ? 'カードを編集' : 'カードを追加'}</h2>
         <p className="modal-hint">※は必須項目です</p>
 
         <label className="modal-field">
@@ -61,6 +63,12 @@ export function CardFormModal({ onCancel, onSubmit }: CardFormModalProps) {
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Delete' || e.key === 'Backspace') {
+                e.preventDefault();
+                setDueDate('');
+              }
+            }}
           />
         </label>
 
@@ -74,7 +82,7 @@ export function CardFormModal({ onCancel, onSubmit }: CardFormModalProps) {
             disabled={!canSubmit}
             onClick={handleSubmit}
           >
-            追加
+            {isEditMode ? '保存' : '追加'}
           </button>
         </div>
       </div>
