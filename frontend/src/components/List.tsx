@@ -14,11 +14,10 @@ interface ListProps {
   onDragStateChange: (cardId: number | null) => void;
 }
 
-function computeDropIndex(container: HTMLElement, clientY: number, draggingCardId: number): number {
+function computeDropIndex(container: HTMLElement, clientY: number): number {
   let index = 0;
-  for (const child of Array.from(container.children) as HTMLElement[]) {
-    const childCardId = Number(child.dataset.cardId);
-    if (childCardId === draggingCardId) continue;
+  const cardElements = container.querySelectorAll<HTMLElement>(':scope > .card');
+  for (const child of Array.from(cardElements)) {
     const rect = child.getBoundingClientRect();
     if (clientY > rect.top + rect.height / 2) {
       index++;
@@ -40,6 +39,7 @@ export function List({
   const [modalState, setModalState] = useState<ModalState>({ mode: 'closed' });
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const cards = [...list.cards].sort((a, b) => a.displayOrder - b.displayOrder);
+  const visibleCards = cards.filter((card) => card.id !== draggingCardId);
 
   const handleSubmit = async (payload: CardCreateRequest) => {
     if (modalState.mode === 'edit') {
@@ -60,7 +60,7 @@ export function List({
         className="card-list"
         onDragOver={(e) => {
           e.preventDefault();
-          setDragOverIndex(computeDropIndex(e.currentTarget, e.clientY, draggingCardId ?? -1));
+          setDragOverIndex(computeDropIndex(e.currentTarget, e.clientY));
         }}
         onDragLeave={() => setDragOverIndex(null)}
         onDrop={(e) => {
@@ -68,11 +68,11 @@ export function List({
           setDragOverIndex(null);
           const cardId = Number(e.dataTransfer.getData('text/plain'));
           if (!cardId) return;
-          const position = computeDropIndex(e.currentTarget, e.clientY, cardId);
+          const position = computeDropIndex(e.currentTarget, e.clientY);
           onMoveCard(cardId, { listId: list.id, position });
         }}
       >
-        {cards.map((card, index) => (
+        {visibleCards.map((card, index) => (
           <Fragment key={card.id}>
             {dragOverIndex === index && <div className="card-drop-placeholder" />}
             <Card
@@ -83,7 +83,7 @@ export function List({
             />
           </Fragment>
         ))}
-        {dragOverIndex === cards.length && <div className="card-drop-placeholder" />}
+        {dragOverIndex === visibleCards.length && <div className="card-drop-placeholder" />}
       </div>
       <button
         type="button"

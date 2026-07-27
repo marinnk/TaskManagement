@@ -84,10 +84,6 @@ body {
   cursor: grab;
 }
 
-.card-dragging {
-  opacity: 0.4;
-}
-
 .card-title {
   white-space: pre-wrap;
 }

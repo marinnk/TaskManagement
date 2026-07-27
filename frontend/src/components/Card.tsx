@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { CardDto } from '../types/board';
 
 interface CardProps {
@@ -9,23 +8,17 @@ interface CardProps {
 }
 
 export function Card({ card, onDoubleClick, onDragStart, onDragEnd }: CardProps) {
-  const [isDragging, setIsDragging] = useState(false);
-
   return (
     <div
-      className={`card${isDragging ? ' card-dragging' : ''}`}
+      className="card"
       data-card-id={card.id}
       draggable
       onDragStart={(e) => {
         e.dataTransfer.setData('text/plain', String(card.id));
         e.dataTransfer.effectAllowed = 'move';
-        setIsDragging(true);
         onDragStart(card);
       }}
-      onDragEnd={() => {
-        setIsDragging(false);
-        onDragEnd();
-      }}
+      onDragEnd={onDragEnd}
       onDoubleClick={() => onDoubleClick(card)}
     >
       <div className="card-title">{card.title}</div>
