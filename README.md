@@ -45,7 +45,7 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ## ステータス
 
-現在、ボード詳細取得API（読み取り専用）とフロントエンドのボード画面表示まで実装済みです。カードの追加・編集・削除・ドラッグ&ドロップ等は今後実装予定です。詳細は [機能要件](docs/functional-requirements.md) を参照してください。
+現在、ボード・リストの表示、カードの追加・編集・削除、ドラッグ&ドロップによるカードの移動・並び替えまで実装済みです。詳細は [機能要件](docs/functional-requirements.md) を参照してください。
 
 ## セットアップ
 
@@ -100,6 +100,17 @@ npm run dev
   ボード一覧取得
 - `[GET] /api/boards/{id}`  
   ボード詳細（リスト・カードを含む）取得
+
+### カード
+
+- `[POST] /api/lists/{listId}/cards`  
+  カード追加
+- `[PUT] /api/lists/{listId}/cards/{cardId}`  
+  カード更新（編集）
+- `[DELETE] /api/lists/{listId}/cards/{cardId}`  
+  カード削除
+- `[PATCH] /api/cards/{cardId}/position`  
+  カードの移動・並び替え（所属リスト・表示順の更新）
 
 ## テスト
 
