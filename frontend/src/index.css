@@ -65,6 +65,13 @@ body {
   gap: 6px;
   overflow-y: auto;
   min-height: 8px;
+  flex: 1;
+}
+
+.card-drop-placeholder {
+  height: 40px;
+  border: 2px dashed rgba(9, 30, 66, 0.3);
+  border-radius: 6px;
 }
 
 .card {
@@ -74,6 +81,11 @@ body {
   box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
   font-size: 0.9rem;
   word-break: break-word;
+  cursor: grab;
+}
+
+.card-dragging {
+  opacity: 0.4;
 }
 
 .card-title {

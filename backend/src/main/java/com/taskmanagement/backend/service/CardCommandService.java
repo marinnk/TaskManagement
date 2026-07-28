@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.taskmanagement.backend.dto.CardCreateRequest;
+import com.taskmanagement.backend.dto.CardMoveRequest;
 import com.taskmanagement.backend.dto.CardResponse;
 import com.taskmanagement.backend.entity.Card;
 import com.taskmanagement.backend.repository.CardRepository;
@@ -96,6 +97,53 @@ public class CardCommandService {
             cardRepository.saveAll(reordered);
         } else {
             cardRepository.save(card);
+        }
+
+        return new CardResponse(
+                card.getId(),
+                card.getTitle(),
+                card.getDescription(),
+                card.getDueDate(),
+                card.getDisplayOrder());
+    }
+
+    @Transactional
+    public CardResponse moveCard(Long cardId, CardMoveRequest request) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "card not found: id=" + cardId));
+
+        Long destinationListId = request.listId();
+        var destinationList = taskListRepository.findById(destinationListId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "list not found: id=" + destinationListId));
+
+        Long sourceListId = card.getList().getId();
+        boolean sameList = sourceListId.equals(destinationListId);
+
+        List<Card> destinationSiblings = new ArrayList<>();
+        for (Card c : cardRepository.findByListIdOrderByDisplayOrderAsc(destinationListId)) {
+            if (!c.getId().equals(cardId)) {
+                destinationSiblings.add(c);
+            }
+        }
+
+        int position = request.position() == null ? destinationSiblings.size() : request.position();
+        position = Math.max(0, Math.min(position, destinationSiblings.size()));
+
+        card.setList(destinationList);
+        destinationSiblings.add(position, card);
+        for (int i = 0; i < destinationSiblings.size(); i++) {
+            destinationSiblings.get(i).setDisplayOrder(i);
+        }
+        cardRepository.saveAll(destinationSiblings);
+
+        if (!sameList) {
+            List<Card> sourceRemaining = cardRepository.findByListIdOrderByDisplayOrderAsc(sourceListId);
+            for (int i = 0; i < sourceRemaining.size(); i++) {
+                sourceRemaining.get(i).setDisplayOrder(i);
+            }
+            cardRepository.saveAll(sourceRemaining);
         }
 
         return new CardResponse(
