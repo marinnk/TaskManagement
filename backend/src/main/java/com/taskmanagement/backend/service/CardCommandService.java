@@ -108,6 +108,25 @@ public class CardCommandService {
     }
 
     @Transactional
+    public void deleteCard(Long listId, Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "card not found: id=" + cardId));
+        if (!card.getList().getId().equals(listId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "card not found: id=" + cardId + " in list=" + listId);
+        }
+
+        cardRepository.delete(card);
+
+        List<Card> remaining = cardRepository.findByListIdOrderByDisplayOrderAsc(listId);
+        for (int i = 0; i < remaining.size(); i++) {
+            remaining.get(i).setDisplayOrder(i);
+        }
+        cardRepository.saveAll(remaining);
+    }
+
+    @Transactional
     public CardResponse moveCard(Long cardId, CardMoveRequest request) {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResponseStatusException(

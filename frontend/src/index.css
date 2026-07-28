@@ -88,8 +88,32 @@ body {
   opacity: 0.4;
 }
 
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
 .card-title {
   white-space: pre-wrap;
+}
+
+.card-delete-button {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #5e6c84;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.card-delete-button:hover {
+  background: #ffebe6;
+  color: #eb5a46;
 }
 
 .card-description {
@@ -173,6 +197,12 @@ body {
   color: #5e6c84;
 }
 
+.modal-message {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #172b4d;
+}
+
 .required-mark {
   color: #eb5a46;
   margin-left: 2px;
@@ -220,5 +250,15 @@ body {
 
 .modal-button-primary:disabled {
   background: #a5c8e1;
+  cursor: not-allowed;
+}
+
+.modal-button-danger {
+  background: #eb5a46;
+  color: #fff;
+}
+
+.modal-button-danger:disabled {
+  background: #f2a79d;
   cursor: not-allowed;
 }
