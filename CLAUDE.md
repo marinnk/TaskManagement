@@ -44,6 +44,14 @@ Claude Codeがこのリポジトリで作業する際に必ず守るルールで
 
    PRのマージ（`gh pr merge`）は共有状態への変更にあたるため、ユーザーに明示的に確認を取ってから実行してください。無断でマージしないこと。
 
+## コーディング規約
+
+- 新しい機能を実装する際は、対応する自動テストも合わせて実装してください。
+  - フロントエンド：Vitest + React Testing Library でコンポーネント・ロジックのテストを書く（`npm run test`）
+  - バックエンド：JUnit + Mockito でサービス層の単体テストを書く（`./gradlew test`）
+- PRを作成する前に、フロントエンド（`npm run lint` / `npm run test`）・バックエンド（`./gradlew test`）を実行し、エラーが無いことを確認してください。
+- 上記はGitHub Actions（`.github/workflows/ci.yml`）により、push・PR作成のたびに自動実行されます。CIが落ちた状態でのマージはしないでください。
+
 ## 動作確認のためにサーバーを起動する場合
 
 バックエンド・フロントエンドの起動手順は `.claude/skills/run-app/SKILL.md` を参照してください。特に以下は必ず守ること。

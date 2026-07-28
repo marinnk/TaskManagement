@@ -120,11 +120,12 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home
 ./gradlew test
 ```
 
-フロントエンドは以下でLintを実行できます。
+フロントエンドは以下でLint・自動テストを実行できます。
 
 ```sh
 cd frontend
 npm run lint
+npm run test
 ```
 
 ## 関連ドキュメント

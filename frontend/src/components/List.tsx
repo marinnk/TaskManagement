@@ -1,5 +1,6 @@
 import { Fragment, useState } from 'react';
 import type { CardCreateRequest, CardDto, CardMoveRequest, TaskListDto } from '../types/board';
+import { computeDropIndex } from '../dragDrop';
 import { Card } from './Card';
 import { CardFormModal } from './CardFormModal';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -18,23 +19,6 @@ interface ListProps {
   onMoveCard: (cardId: number, payload: CardMoveRequest) => Promise<void>;
   draggingCardId: number | null;
   onDragStateChange: (cardId: number | null) => void;
-}
-
-// 「ドラッグ中のカード自身」を除いた、他のカードだけを数えた挿入先index。
-// バックエンドのCardCommandService#moveCardが期待する「自分以外のカードの中での位置」と同じ意味。
-function computeDropIndex(container: HTMLElement, clientY: number, draggingCardId: number): number {
-  let index = 0;
-  const cardElements = container.querySelectorAll<HTMLElement>(':scope > .card');
-  for (const child of Array.from(cardElements)) {
-    if (Number(child.dataset.cardId) === draggingCardId) continue;
-    const rect = child.getBoundingClientRect();
-    if (clientY > rect.top + rect.height / 2) {
-      index++;
-    } else {
-      break;
-    }
-  }
-  return index;
 }
 
 export function List({
