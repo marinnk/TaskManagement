@@ -1,5 +1,6 @@
 package com.taskmanagement.backend.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -143,5 +144,32 @@ class CardControllerTest {
                                 {"title":"新しいタスク","description":null,"dueDate":null}
                                 """))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteCard_removesCardAndReordersRemainingCards() throws Exception {
+        mockMvc.perform(delete("/api/lists/1/cards/1"))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/boards/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lists[0].cards.length()").value(1))
+                .andExpect(jsonPath("$.lists[0].cards[0].title").value("DB設計をレビューする"))
+                .andExpect(jsonPath("$.lists[0].cards[0].displayOrder").value(0));
+    }
+
+    @Test
+    void deleteCard_withUnknownCardId_returns404() throws Exception {
+        mockMvc.perform(delete("/api/lists/1/cards/9999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteCard_withCardIdBelongingToDifferentList_returns404() throws Exception {
+        mockMvc.perform(delete("/api/lists/1/cards/3"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(get("/api/boards/1"))
+                .andExpect(jsonPath("$.lists[1].cards.length()").value(1));
     }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getBoardDetail, getBoards } from '../api/boards';
-import { createCard, moveCard, updateCard } from '../api/cards';
+import { createCard, deleteCard, moveCard, updateCard } from '../api/cards';
 import type { BoardDetailDto, CardCreateRequest, CardMoveRequest } from '../types/board';
 import { List } from './List';
 
@@ -75,6 +75,18 @@ export function BoardScreen() {
     }
   };
 
+  const handleDeleteCard = async (listId: number, cardId: number) => {
+    setCardError(null);
+    try {
+      await deleteCard(listId, cardId);
+      const detail = await getBoardDetail(board.id);
+      setBoard(detail);
+    } catch (error) {
+      console.error(error);
+      setCardError('カードの削除に失敗しました');
+    }
+  };
+
   const handleMoveCard = async (cardId: number, payload: CardMoveRequest) => {
     setCardError(null);
     try {
@@ -100,6 +112,7 @@ export function BoardScreen() {
             list={list}
             onAddCard={handleAddCard}
             onUpdateCard={handleUpdateCard}
+            onDeleteCard={handleDeleteCard}
             onMoveCard={handleMoveCard}
             draggingCardId={draggingCardId}
             onDragStateChange={setDraggingCardId}

@@ -2,13 +2,19 @@ import { Fragment, useState } from 'react';
 import type { CardCreateRequest, CardDto, CardMoveRequest, TaskListDto } from '../types/board';
 import { Card } from './Card';
 import { CardFormModal } from './CardFormModal';
+import { ConfirmDialog } from './ConfirmDialog';
 
-type ModalState = { mode: 'closed' } | { mode: 'add' } | { mode: 'edit'; card: CardDto };
+type ModalState =
+  | { mode: 'closed' }
+  | { mode: 'add' }
+  | { mode: 'edit'; card: CardDto }
+  | { mode: 'delete'; card: CardDto };
 
 interface ListProps {
   list: TaskListDto;
   onAddCard: (listId: number, payload: CardCreateRequest) => Promise<void>;
   onUpdateCard: (listId: number, cardId: number, payload: CardCreateRequest) => Promise<void>;
+  onDeleteCard: (listId: number, cardId: number) => Promise<void>;
   onMoveCard: (cardId: number, payload: CardMoveRequest) => Promise<void>;
   draggingCardId: number | null;
   onDragStateChange: (cardId: number | null) => void;
@@ -35,6 +41,7 @@ export function List({
   list,
   onAddCard,
   onUpdateCard,
+  onDeleteCard,
   onMoveCard,
   draggingCardId,
   onDragStateChange,
@@ -58,6 +65,12 @@ export function List({
     } else {
       await onAddCard(list.id, payload);
     }
+    setModalState({ mode: 'closed' });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (modalState.mode !== 'delete') return;
+    await onDeleteCard(list.id, modalState.card.id);
     setModalState({ mode: 'closed' });
   };
 
@@ -92,6 +105,7 @@ export function List({
               card={card}
               isDragging={card.id === draggingCardId}
               onDoubleClick={(c) => setModalState({ mode: 'edit', card: c })}
+              onDeleteClick={(c) => setModalState({ mode: 'delete', card: c })}
               onDragStart={(c) => onDragStateChange(c.id)}
               onDragEnd={() => onDragStateChange(null)}
             />
@@ -106,7 +120,7 @@ export function List({
       >
         + カード追加
       </button>
-      {modalState.mode !== 'closed' && (
+      {(modalState.mode === 'add' || modalState.mode === 'edit') && (
         <CardFormModal
           initialValues={
             modalState.mode === 'edit'
@@ -119,6 +133,14 @@ export function List({
           }
           onCancel={() => setModalState({ mode: 'closed' })}
           onSubmit={handleSubmit}
+        />
+      )}
+      {modalState.mode === 'delete' && (
+        <ConfirmDialog
+          title="カードを削除しますか?"
+          message={`「${modalState.card.title}」を削除します。この操作は取り消せません。`}
+          onCancel={() => setModalState({ mode: 'closed' })}
+          onConfirm={handleDeleteConfirm}
         />
       )}
     </div>

@@ -4,11 +4,12 @@ interface CardProps {
   card: CardDto;
   isDragging: boolean;
   onDoubleClick: (card: CardDto) => void;
+  onDeleteClick: (card: CardDto) => void;
   onDragStart: (card: CardDto) => void;
   onDragEnd: () => void;
 }
 
-export function Card({ card, isDragging, onDoubleClick, onDragStart, onDragEnd }: CardProps) {
+export function Card({ card, isDragging, onDoubleClick, onDeleteClick, onDragStart, onDragEnd }: CardProps) {
   return (
     <div
       className={`card${isDragging ? ' card-dragging' : ''}`}
@@ -22,7 +23,20 @@ export function Card({ card, isDragging, onDoubleClick, onDragStart, onDragEnd }
       onDragEnd={onDragEnd}
       onDoubleClick={() => onDoubleClick(card)}
     >
-      <div className="card-title">{card.title}</div>
+      <div className="card-header">
+        <div className="card-title">{card.title}</div>
+        <button
+          type="button"
+          className="card-delete-button"
+          aria-label="カードを削除"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeleteClick(card);
+          }}
+        >
+          ×
+        </button>
+      </div>
       {card.description && <p className="card-description">{card.description}</p>}
       {card.dueDate && <span className="card-due">{card.dueDate}</span>}
     </div>

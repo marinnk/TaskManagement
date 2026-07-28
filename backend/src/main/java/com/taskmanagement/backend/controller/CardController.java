@@ -1,6 +1,7 @@
 package com.taskmanagement.backend.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,5 +36,11 @@ public class CardController {
             @PathVariable Long cardId,
             @RequestBody CardCreateRequest request) {
         return cardCommandService.updateCard(listId, cardId, request);
+    }
+
+    @DeleteMapping("/{cardId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCard(@PathVariable Long listId, @PathVariable Long cardId) {
+        cardCommandService.deleteCard(listId, cardId);
     }
 }
