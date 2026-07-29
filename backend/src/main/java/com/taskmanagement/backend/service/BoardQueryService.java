@@ -22,7 +22,7 @@ import com.taskmanagement.backend.repository.TaskListRepository;
 @Service
 public class BoardQueryService {
 
-    private static final Logger log = LoggerFactory.getLogger(BoardQueryService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BoardQueryService.class);
 
     private final BoardRepository boardRepository;
     private final TaskListRepository taskListRepository;
@@ -47,7 +47,7 @@ public class BoardQueryService {
     public BoardDetailResponse getBoardDetail(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> {
-                    log.warn("board not found: id={}", boardId);
+                    LOG.warn("board not found: id={}", boardId);
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "board not found: id=" + boardId);
                 });
 

@@ -22,7 +22,7 @@ import com.taskmanagement.backend.repository.TaskListRepository;
 @Service
 public class CardCommandService {
 
-    private static final Logger log = LoggerFactory.getLogger(CardCommandService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CardCommandService.class);
 
     private final CardRepository cardRepository;
     private final TaskListRepository taskListRepository;
@@ -54,7 +54,7 @@ public class CardCommandService {
         }
         cardRepository.saveAll(reordered);
 
-        log.info("card created: id={}, listId={}", newCard.getId(), listId);
+        LOG.info("card created: id={}, listId={}", newCard.getId(), listId);
 
         return new CardResponse(
                 newCard.getId(),
@@ -99,7 +99,7 @@ public class CardCommandService {
             cardRepository.save(card);
         }
 
-        log.info("card updated: id={}, listId={}", card.getId(), listId);
+        LOG.info("card updated: id={}, listId={}", card.getId(), listId);
 
         return new CardResponse(
                 card.getId(),
@@ -127,7 +127,7 @@ public class CardCommandService {
         }
         cardRepository.saveAll(remaining);
 
-        log.info("card deleted: id={}, listId={}", cardId, listId);
+        LOG.info("card deleted: id={}, listId={}", cardId, listId);
     }
 
     @Transactional
@@ -169,7 +169,7 @@ public class CardCommandService {
             cardRepository.saveAll(sourceRemaining);
         }
 
-        log.info("card moved: id={}, sourceListId={}, destinationListId={}, position={}",
+        LOG.info("card moved: id={}, sourceListId={}, destinationListId={}, position={}",
                 cardId, sourceListId, destinationListId, position);
 
         return new CardResponse(
