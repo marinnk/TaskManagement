@@ -1,0 +1,20 @@
+CREATE TABLE board (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE list (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    board_id BIGINT NOT NULL REFERENCES board (id),
+    display_order INT NOT NULL
+);
+
+CREATE TABLE card (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    due_date DATE,
+    list_id BIGINT NOT NULL REFERENCES list (id),
+    display_order INT NOT NULL
+);
