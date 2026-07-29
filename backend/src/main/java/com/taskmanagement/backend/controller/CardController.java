@@ -1,5 +1,6 @@
 package com.taskmanagement.backend.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +27,7 @@ public class CardController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CardResponse createCard(@PathVariable Long listId, @RequestBody CardCreateRequest request) {
+    public CardResponse createCard(@PathVariable Long listId, @Valid @RequestBody CardCreateRequest request) {
         return cardCommandService.createCard(listId, request);
     }
 
@@ -34,7 +35,7 @@ public class CardController {
     public CardResponse updateCard(
             @PathVariable Long listId,
             @PathVariable Long cardId,
-            @RequestBody CardCreateRequest request) {
+            @Valid @RequestBody CardCreateRequest request) {
         return cardCommandService.updateCard(listId, cardId, request);
     }
 

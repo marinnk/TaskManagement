@@ -2,8 +2,6 @@ package com.taskmanagement.backend.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,19 +50,6 @@ class CardCommandServiceTest {
         TaskList list = new TaskList();
         list.setId(id);
         return list;
-    }
-
-    @Test
-    void createCard_タイトルが空白のみの場合はBAD_REQUESTになりカードは保存されない() {
-        when(taskListRepository.findById(1L)).thenReturn(Optional.of(list(1L)));
-
-        var request = new CardCreateRequest("   ", null, null);
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> cardCommandService.createCard(1L, request));
-
-        assertThat(exception.getStatusCode().value()).isEqualTo(400);
-        verify(cardRepository, never()).saveAll(any());
     }
 
     @Test
@@ -126,18 +111,6 @@ class CardCommandServiceTest {
         CardResponse response = cardCommandService.createCard(1L, request);
 
         assertThat(response.title()).isEqualTo("買い物");
-    }
-
-    @Test
-    void updateCard_タイトルが空白のみの場合はBAD_REQUESTになる() {
-        Card existing = card(5, null);
-        existing.setList(list(1L));
-        when(cardRepository.findById(5L)).thenReturn(Optional.of(existing));
-
-        var request = new CardCreateRequest(" ", null, null);
-
-        assertThrows(ResponseStatusException.class,
-                () -> cardCommandService.updateCard(1L, 5L, request));
     }
 
     @Test

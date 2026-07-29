@@ -34,10 +34,7 @@ public class CardCommandService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "list not found: id=" + listId));
 
-        String title = request.title() == null ? "" : request.title().trim();
-        if (title.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "title must not be blank");
-        }
+        String title = request.title().trim();
 
         Card newCard = new Card();
         newCard.setList(list);
@@ -71,10 +68,7 @@ public class CardCommandService {
                     HttpStatus.NOT_FOUND, "card not found: id=" + cardId + " in list=" + listId);
         }
 
-        String title = request.title() == null ? "" : request.title().trim();
-        if (title.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "title must not be blank");
-        }
+        String title = request.title().trim();
 
         boolean dueDateChanged = !Objects.equals(card.getDueDate(), request.dueDate());
 
