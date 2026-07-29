@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import type { CardCreateRequest, CardDto, CardMoveRequest, TaskListDto } from '../types/board';
 import { computeDropIndex } from '../dragDrop';
 import { Card } from './Card';
@@ -58,6 +58,22 @@ export function List({
     setModalState({ mode: 'closed' });
   };
 
+  // Cardをmemo化していても、ここで渡す関数が毎回新しく作られると
+  // memoが効かないため、useCallbackで関数の参照を安定させる。
+  const handleCardDoubleClick = useCallback(
+    (card: CardDto) => setModalState({ mode: 'edit', card }),
+    [],
+  );
+  const handleCardDeleteClick = useCallback(
+    (card: CardDto) => setModalState({ mode: 'delete', card }),
+    [],
+  );
+  const handleCardDragStart = useCallback(
+    (card: CardDto) => onDragStateChange(card.id),
+    [onDragStateChange],
+  );
+  const handleCardDragEnd = useCallback(() => onDragStateChange(null), [onDragStateChange]);
+
   return (
     <div className="list">
       <div className="list-name">
@@ -88,10 +104,10 @@ export function List({
             <Card
               card={card}
               isDragging={card.id === draggingCardId}
-              onDoubleClick={(c) => setModalState({ mode: 'edit', card: c })}
-              onDeleteClick={(c) => setModalState({ mode: 'delete', card: c })}
-              onDragStart={(c) => onDragStateChange(c.id)}
-              onDragEnd={() => onDragStateChange(null)}
+              onDoubleClick={handleCardDoubleClick}
+              onDeleteClick={handleCardDeleteClick}
+              onDragStart={handleCardDragStart}
+              onDragEnd={handleCardDragEnd}
             />
           </Fragment>
         ))}
