@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,8 @@ import com.taskmanagement.backend.repository.TaskListRepository;
 
 @Service
 public class CardCommandService {
+
+    private static final Logger log = LoggerFactory.getLogger(CardCommandService.class);
 
     private final CardRepository cardRepository;
     private final TaskListRepository taskListRepository;
@@ -49,6 +53,8 @@ public class CardCommandService {
             reordered.get(i).setDisplayOrder(i);
         }
         cardRepository.saveAll(reordered);
+
+        log.info("card created: id={}, listId={}", newCard.getId(), listId);
 
         return new CardResponse(
                 newCard.getId(),
@@ -93,6 +99,8 @@ public class CardCommandService {
             cardRepository.save(card);
         }
 
+        log.info("card updated: id={}, listId={}", card.getId(), listId);
+
         return new CardResponse(
                 card.getId(),
                 card.getTitle(),
@@ -118,6 +126,8 @@ public class CardCommandService {
             remaining.get(i).setDisplayOrder(i);
         }
         cardRepository.saveAll(remaining);
+
+        log.info("card deleted: id={}, listId={}", cardId, listId);
     }
 
     @Transactional
@@ -158,6 +168,9 @@ public class CardCommandService {
             }
             cardRepository.saveAll(sourceRemaining);
         }
+
+        log.info("card moved: id={}, sourceListId={}, destinationListId={}, position={}",
+                cardId, sourceListId, destinationListId, position);
 
         return new CardResponse(
                 card.getId(),
