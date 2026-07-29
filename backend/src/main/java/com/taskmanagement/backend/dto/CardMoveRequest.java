@@ -1,4 +1,10 @@
 package com.taskmanagement.backend.dto;
 
-public record CardMoveRequest(Long listId, Integer position) {
+import jakarta.validation.constraints.NotNull;
+
+public record CardMoveRequest(
+        @NotNull(message = "listId must not be null")
+        Long listId,
+        Integer position
+) {
 }

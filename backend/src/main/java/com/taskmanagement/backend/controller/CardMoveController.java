@@ -1,5 +1,6 @@
 package com.taskmanagement.backend.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class CardMoveController {
     }
 
     @PatchMapping("/{cardId}/position")
-    public CardResponse moveCard(@PathVariable Long cardId, @RequestBody CardMoveRequest request) {
+    public CardResponse moveCard(@PathVariable Long cardId, @Valid @RequestBody CardMoveRequest request) {
         return cardCommandService.moveCard(cardId, request);
     }
 }
