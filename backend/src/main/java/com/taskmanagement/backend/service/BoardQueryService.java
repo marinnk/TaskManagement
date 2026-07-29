@@ -2,6 +2,8 @@ package com.taskmanagement.backend.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,8 @@ import com.taskmanagement.backend.repository.TaskListRepository;
 
 @Service
 public class BoardQueryService {
+
+    private static final Logger log = LoggerFactory.getLogger(BoardQueryService.class);
 
     private final BoardRepository boardRepository;
     private final TaskListRepository taskListRepository;
@@ -42,8 +46,10 @@ public class BoardQueryService {
     @Transactional(readOnly = true)
     public BoardDetailResponse getBoardDetail(Long boardId) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "board not found: id=" + boardId));
+                .orElseThrow(() -> {
+                    log.warn("board not found: id={}", boardId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "board not found: id=" + boardId);
+                });
 
         List<TaskListResponse> lists = taskListRepository
                 .findByBoardIdOrderByDisplayOrderAsc(boardId).stream()
