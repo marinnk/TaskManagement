@@ -53,4 +53,4 @@ jobs:
           distribution: temurin
           java-version: '25'
 
-      - run: ./gradlew test
+      - run: ./gradlew check

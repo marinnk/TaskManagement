@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ResponseStatusException.class)
     public ProblemDetail handleResponseStatusException(ResponseStatusException ex) {
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpectedException(Exception ex) {
-        log.error("unexpected error occurred", ex);
+        LOG.error("unexpected error occurred", ex);
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "unexpected error occurred");
     }
 }
