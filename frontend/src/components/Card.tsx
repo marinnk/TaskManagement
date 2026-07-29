@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { CardDto } from '../types/board';
 
 interface CardProps {
@@ -9,7 +10,7 @@ interface CardProps {
   onDragEnd: () => void;
 }
 
-export function Card({ card, isDragging, onDoubleClick, onDeleteClick, onDragStart, onDragEnd }: CardProps) {
+function CardComponent({ card, isDragging, onDoubleClick, onDeleteClick, onDragStart, onDragEnd }: CardProps) {
   return (
     <div
       className={`card${isDragging ? ' card-dragging' : ''}`}
@@ -42,3 +43,5 @@ export function Card({ card, isDragging, onDoubleClick, onDeleteClick, onDragSta
     </div>
   );
 }
+
+export const Card = memo(CardComponent);
