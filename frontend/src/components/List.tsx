@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState } from 'react';
+import { Fragment, memo, useCallback, useState } from 'react';
 import type { CardCreateRequest, CardDto, CardMoveRequest, TaskListDto } from '../types/board';
 import { computeDropIndex } from '../dragDrop';
 import { Card } from './Card';
@@ -22,7 +22,7 @@ interface ListProps {
   onDragStateChange: (cardId: number | null) => void;
 }
 
-export function List({
+function ListComponent({
   list,
   onAddCard,
   onUpdateCard,
@@ -156,3 +156,5 @@ export function List({
     </div>
   );
 }
+
+export const List = memo(ListComponent);

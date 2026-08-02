@@ -56,4 +56,21 @@ describe('CardFormModal', () => {
 
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
+
+  it('ダイアログとして認識できるrole属性を持ち、タイトル欄に自動でフォーカスされる', () => {
+    render(<CardFormModal onCancel={vi.fn()} onSubmit={vi.fn()} />);
+
+    expect(screen.getByRole('dialog', { name: 'カードを追加' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/タイトル/)).toHaveFocus();
+  });
+
+  it('Escapeキーを押すとonCancelが呼ばれる', async () => {
+    const user = userEvent.setup();
+    const onCancel = vi.fn();
+    render(<CardFormModal onCancel={onCancel} onSubmit={vi.fn()} />);
+
+    await user.keyboard('{Escape}');
+
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
 });

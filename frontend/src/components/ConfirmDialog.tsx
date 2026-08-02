@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Modal } from './Modal';
 
 interface ConfirmDialogProps {
   title: string;
@@ -28,24 +29,24 @@ export function ConfirmDialog({
   };
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">{title}</h2>
-        <p className="modal-message">{message}</p>
-        <div className="modal-actions">
-          <button type="button" className="modal-button" onClick={onCancel} disabled={submitting}>
-            キャンセル
-          </button>
-          <button
-            type="button"
-            className="modal-button modal-button-danger"
-            onClick={handleConfirm}
-            disabled={submitting}
-          >
-            {confirmLabel}
-          </button>
-        </div>
+    <Modal titleId="confirm-dialog-title" onClose={onCancel}>
+      <h2 id="confirm-dialog-title" className="modal-title">
+        {title}
+      </h2>
+      <p className="modal-message">{message}</p>
+      <div className="modal-actions">
+        <button type="button" className="modal-button" onClick={onCancel} disabled={submitting}>
+          キャンセル
+        </button>
+        <button
+          type="button"
+          className="modal-button modal-button-danger"
+          onClick={handleConfirm}
+          disabled={submitting}
+        >
+          {confirmLabel}
+        </button>
       </div>
-    </div>
+    </Modal>
   );
 }

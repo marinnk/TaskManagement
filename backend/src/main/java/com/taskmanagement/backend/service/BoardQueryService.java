@@ -1,6 +1,8 @@
 package com.taskmanagement.backend.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,25 +53,30 @@ public class BoardQueryService {
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "board not found: id=" + boardId);
                 });
 
-        List<TaskListResponse> lists = taskListRepository
-                .findByBoardIdOrderByDisplayOrderAsc(boardId).stream()
-                .map(this::toTaskListResponse)
+        List<TaskList> taskLists = taskListRepository.findByBoardIdOrderByDisplayOrderAsc(boardId);
+        List<Long> listIds = taskLists.stream().map(TaskList::getId).toList();
+
+        Map<Long, List<CardResponse>> cardsByListId = cardRepository
+                .findByListIdInOrderByDisplayOrderAsc(listIds).stream()
+                .collect(Collectors.groupingBy(
+                        card -> card.getList().getId(),
+                        Collectors.mapping(
+                                card -> new CardResponse(
+                                        card.getId(),
+                                        card.getTitle(),
+                                        card.getDescription(),
+                                        card.getDueDate(),
+                                        card.getDisplayOrder()),
+                                Collectors.toList())));
+
+        List<TaskListResponse> lists = taskLists.stream()
+                .map(list -> toTaskListResponse(list, cardsByListId.getOrDefault(list.getId(), List.of())))
                 .toList();
 
         return new BoardDetailResponse(board.getId(), board.getName(), lists);
     }
 
-    private TaskListResponse toTaskListResponse(TaskList list) {
-        List<CardResponse> cards = cardRepository
-                .findByListIdOrderByDisplayOrderAsc(list.getId()).stream()
-                .map(card -> new CardResponse(
-                        card.getId(),
-                        card.getTitle(),
-                        card.getDescription(),
-                        card.getDueDate(),
-                        card.getDisplayOrder()))
-                .toList();
-
+    private TaskListResponse toTaskListResponse(TaskList list, List<CardResponse> cards) {
         return new TaskListResponse(list.getId(), list.getName(), list.getDisplayOrder(), cards);
     }
 }
