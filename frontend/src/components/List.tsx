@@ -81,16 +81,14 @@ export function List({
       <div className="list-name">
         {list.name}
         <span className="list-count">{cards.length}</span>
-        {cards.length > 1 && (
-          <button
-            type="button"
-            className="sort-by-due-date-button"
-            onClick={() => onSortByDueDate(list.id)}
-            title="期限日順に並べ替え"
-          >
-            期限順
-          </button>
-        )}
+        <button
+          type="button"
+          className="sort-by-due-date-button"
+          onClick={() => onSortByDueDate(list.id)}
+          title="期限日順に並べ替え"
+        >
+          期限順
+        </button>
       </div>
       <div
         className="card-list"

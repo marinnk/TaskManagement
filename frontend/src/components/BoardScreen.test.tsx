@@ -97,6 +97,16 @@ describe('BoardScreen', () => {
     expect(await screen.findByText('カードの追加に失敗しました')).toBeInTheDocument();
   });
 
+  it('カードが0枚の列でも期限順ボタンを表示する', async () => {
+    mockGetBoards.mockResolvedValue([summary]);
+    mockGetBoardDetail.mockResolvedValue(detail);
+
+    render(<BoardScreen />);
+
+    await screen.findByRole('heading', { name: 'サンプルボード' });
+    expect(screen.getByRole('button', { name: '期限順' })).toBeInTheDocument();
+  });
+
   it('期限順ボタンをクリックすると並べ替えAPIを呼びボードを再取得する', async () => {
     const user = userEvent.setup();
     mockGetBoards.mockResolvedValue([summary]);
