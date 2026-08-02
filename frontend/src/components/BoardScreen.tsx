@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getBoardDetail, getBoards } from '../api/boards';
-import { createCard, deleteCard, moveCard, updateCard } from '../api/cards';
+import { createCard, deleteCard, moveCard, sortListByDueDate, updateCard } from '../api/cards';
 import type { BoardDetailDto, CardCreateRequest, CardMoveRequest } from '../types/board';
 import { List } from './List';
 
@@ -118,6 +118,18 @@ export function BoardScreen() {
     }
   };
 
+  const handleSortByDueDate = async (listId: number) => {
+    setCardError(null);
+    try {
+      await sortListByDueDate(listId);
+      const detail = await getBoardDetail(board.id);
+      setBoard(detail);
+    } catch (error) {
+      console.error(error);
+      setCardError('カードの並べ替えに失敗しました');
+    }
+  };
+
   return (
     <>
       <header className="board-header">
@@ -133,6 +145,7 @@ export function BoardScreen() {
             onUpdateCard={handleUpdateCard}
             onDeleteCard={handleDeleteCard}
             onMoveCard={handleMoveCard}
+            onSortByDueDate={handleSortByDueDate}
             draggingCardId={draggingCardId}
             onDragStateChange={setDraggingCardId}
           />

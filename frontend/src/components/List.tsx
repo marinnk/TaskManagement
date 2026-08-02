@@ -17,6 +17,7 @@ interface ListProps {
   onUpdateCard: (listId: number, cardId: number, payload: CardCreateRequest) => Promise<void>;
   onDeleteCard: (listId: number, cardId: number) => Promise<void>;
   onMoveCard: (cardId: number, payload: CardMoveRequest) => Promise<void>;
+  onSortByDueDate: (listId: number) => Promise<void>;
   draggingCardId: number | null;
   onDragStateChange: (cardId: number | null) => void;
 }
@@ -27,6 +28,7 @@ export function List({
   onUpdateCard,
   onDeleteCard,
   onMoveCard,
+  onSortByDueDate,
   draggingCardId,
   onDragStateChange,
 }: ListProps) {
@@ -79,6 +81,16 @@ export function List({
       <div className="list-name">
         {list.name}
         <span className="list-count">{cards.length}</span>
+        {cards.length > 1 && (
+          <button
+            type="button"
+            className="sort-by-due-date-button"
+            onClick={() => onSortByDueDate(list.id)}
+            title="期限日順に並べ替え"
+          >
+            期限順
+          </button>
+        )}
       </div>
       <div
         className="card-list"

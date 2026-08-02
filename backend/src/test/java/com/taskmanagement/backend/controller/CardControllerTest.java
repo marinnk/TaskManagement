@@ -2,6 +2,7 @@ package com.taskmanagement.backend.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -171,5 +172,35 @@ class CardControllerTest {
 
         mockMvc.perform(get("/api/boards/1"))
                 .andExpect(jsonPath("$.lists[1].cards.length()").value(1));
+    }
+
+    @Test
+    void sortCardsByDueDate_reordersCardsInAscendingDueDateOrder() throws Exception {
+        mockMvc.perform(patch("/api/cards/2/position")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"listId":1,"position":0}
+                                """))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/api/lists/1/cards/sort-by-due-date"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].title").value("要件定義書を作成する"))
+                .andExpect(jsonPath("$[0].displayOrder").value(0))
+                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[1].displayOrder").value(1));
+
+        mockMvc.perform(get("/api/boards/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lists[0].cards[0].title").value("要件定義書を作成する"))
+                .andExpect(jsonPath("$.lists[0].cards[1].title").value("DB設計をレビューする"));
+    }
+
+    @Test
+    void sortCardsByDueDate_withUnknownListId_returns404() throws Exception {
+        mockMvc.perform(patch("/api/lists/9999/cards/sort-by-due-date"))
+                .andExpect(status().isNotFound());
     }
 }
