@@ -36,10 +36,11 @@ Trello風のかんばん方式タスク管理Webアプリケーション。
 
 ```
 .
-├── backend/    # Spring Boot（REST API）
-├── frontend/   # React + Vite（画面）
+├── backend/    # Spring Boot（REST API、Dockerfile含む）
+├── frontend/   # React + Vite（画面、Dockerfile・nginx.conf含む）
 ├── docs/       # 要件定義・設計ドキュメント
 ├── mockup/     # 画面モックアップ
+├── terraform/  # AWSインフラ定義（Terraform）
 └── docker-compose.yml  # PostgreSQL起動用
 ```
 
@@ -140,6 +141,8 @@ npm run test
   エンティティ・テーブル定義・ER図
 - [非機能要件](docs/non-functional-requirements.md)  
   技術スタックのバージョン、性能・セキュリティ等
+- [インフラ構成](docs/infrastructure.md)  
+  AWS上のデプロイ構成図、リソース設定、ネットワーク・セキュリティグループ
 
 ## 開発フロー
 
