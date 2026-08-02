@@ -33,7 +33,9 @@ resource "local_file" "private_key" {
   file_permission = "0600"
 }
 
-# セキュリティグループ：SSH(22番)のみ、指定したIPからだけ許可する
+# セキュリティグループ：SSH(22番)・HTTP(80番)を、指定したIPからだけ許可する
+# （リソース名はssh_onlyのままだが、AWS側のdescriptionと同様に変更すると
+# セキュリティグループの再作成が必要になるため、Phase 3bでの80番追加後も維持している）
 resource "aws_security_group" "ssh_only" {
   name        = "${var.project_name}-sg"
   description = "Allow SSH only from a specific IP"

@@ -9,4 +9,6 @@ import com.taskmanagement.backend.entity.Card;
 public interface CardRepository extends JpaRepository<Card, Long> {
 
     List<Card> findByListIdOrderByDisplayOrderAsc(Long listId);
+
+    List<Card> findByListIdInOrderByDisplayOrderAsc(List<Long> listIds);
 }

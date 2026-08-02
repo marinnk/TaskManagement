@@ -1,9 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BoardScreen } from './BoardScreen';
 import { getBoardDetail, getBoards } from '../api/boards';
-import { createCard, sortListByDueDate } from '../api/cards';
+import { createCard, deleteCard, sortListByDueDate } from '../api/cards';
 import type { BoardDetailDto, BoardSummaryDto } from '../types/board';
 
 vi.mock('../api/boards');
@@ -12,6 +12,7 @@ vi.mock('../api/cards');
 const mockGetBoards = vi.mocked(getBoards);
 const mockGetBoardDetail = vi.mocked(getBoardDetail);
 const mockCreateCard = vi.mocked(createCard);
+const mockDeleteCard = vi.mocked(deleteCard);
 const mockSortListByDueDate = vi.mocked(sortListByDueDate);
 
 const summary: BoardSummaryDto = { id: 1, name: 'サンプルボード' };
@@ -107,18 +108,24 @@ describe('BoardScreen', () => {
     expect(screen.getByRole('button', { name: '期限順' })).toBeInTheDocument();
   });
 
-  it('期限順ボタンをクリックすると並べ替えAPIを呼びボードを再取得する', async () => {
+  it('期限順ボタンをクリックすると並べ替えAPIを呼び、返ってきた並び順をそのまま表示する（ボードの再取得はしない）', async () => {
     const user = userEvent.setup();
     mockGetBoards.mockResolvedValue([summary]);
     mockGetBoardDetail.mockResolvedValue(detailWithCards);
-    mockSortListByDueDate.mockResolvedValue([]);
+    mockSortListByDueDate.mockResolvedValue([
+      { id: 101, title: 'タスクB', description: null, dueDate: null, displayOrder: 0 },
+      { id: 100, title: 'タスクA', description: null, dueDate: '2026-08-10', displayOrder: 1 },
+    ]);
 
     render(<BoardScreen />);
 
     await screen.findByRole('heading', { name: 'サンプルボード' });
+    expect(mockGetBoardDetail).toHaveBeenCalledTimes(1);
+
     await user.click(screen.getByRole('button', { name: '期限順' }));
 
     expect(mockSortListByDueDate).toHaveBeenCalledWith(10);
+    expect(mockGetBoardDetail).toHaveBeenCalledTimes(1);
   });
 
   it('並べ替えに失敗するとカードエラーメッセージを表示する', async () => {
@@ -133,5 +140,25 @@ describe('BoardScreen', () => {
     await user.click(screen.getByRole('button', { name: '期限順' }));
 
     expect(await screen.findByText('カードの並べ替えに失敗しました')).toBeInTheDocument();
+  });
+
+  it('カードを削除すると画面から消え、ボードは再取得しない', async () => {
+    const user = userEvent.setup();
+    mockGetBoards.mockResolvedValue([summary]);
+    mockGetBoardDetail.mockResolvedValue(detailWithCards);
+    mockDeleteCard.mockResolvedValue(undefined);
+
+    render(<BoardScreen />);
+
+    await screen.findByRole('heading', { name: 'サンプルボード' });
+    expect(mockGetBoardDetail).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getAllByRole('button', { name: 'カードを削除' })[0]);
+    await user.click(screen.getByRole('button', { name: '削除' }));
+
+    expect(mockDeleteCard).toHaveBeenCalledWith(10, 100);
+    await waitFor(() => expect(screen.queryByText('タスクA')).not.toBeInTheDocument());
+    expect(screen.getByText('タスクB')).toBeInTheDocument();
+    expect(mockGetBoardDetail).toHaveBeenCalledTimes(1);
   });
 });

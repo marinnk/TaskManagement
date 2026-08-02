@@ -112,6 +112,8 @@ npm run dev
   カード削除
 - `[PATCH] /api/cards/{cardId}/position`  
   カードの移動・並び替え（所属リスト・表示順の更新）
+- `[PATCH] /api/lists/{listId}/cards/sort-by-due-date`  
+  リスト内のカードを期限日順に並べ替え
 
 ## テスト
 
