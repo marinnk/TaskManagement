@@ -381,3 +381,35 @@ body {
   background: var(--color-danger-disabled);
   cursor: not-allowed;
 }
+
+/* レスポンシブ */
+@media (max-width: 600px) {
+  .board-header {
+    padding: var(--space-lg) var(--space-3xl);
+  }
+
+  .board {
+    flex-direction: column;
+    padding: var(--space-3xl) var(--space-lg);
+    gap: var(--space-lg);
+  }
+
+  .list {
+    width: 100%;
+    flex: none;
+    max-height: none;
+  }
+
+  .card-delete-button {
+    padding: var(--space-sm);
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal {
+    padding: var(--space-2xl);
+  }
+}
