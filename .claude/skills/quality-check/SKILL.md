@@ -1,11 +1,11 @@
 ---
 name: quality-check
-description: Run a comprehensive code-quality review of the TaskManagement app (Spring Boot backend + React/Vite frontend) — automated lint/test/build checks plus a deeper architectural review comparing the implementation against docs/ and README.md and common React/Spring Boot anti-patterns. Use whenever the user asks for a "品質チェック"/"quality check"/"code review" of the whole app, wants to know if the codebase has drifted from best practices or from the requirements docs, or asks to check the app before a release/milestone. Do not use this for routine per-PR verification — CI already covers that; this skill is for the periodic, deeper review.
+description: Run a comprehensive code-quality review of the TaskManagement app (Spring Boot backend + React/Vite frontend + Terraform infrastructure) — automated lint/test/build/fmt/validate checks plus a deeper architectural review comparing the implementation against docs/ and README.md, common React/Spring Boot anti-patterns, and Terraform/AWS infrastructure concerns (secrets handling, network exposure, free-tier consistency). Use whenever the user asks for a "品質チェック"/"quality check"/"code review" of the whole app or its infrastructure, wants to know if the codebase has drifted from best practices or from the requirements docs, or asks to check the app before a release/milestone. Do not use this for routine per-PR verification — CI already covers that; this skill is for the periodic, deeper review.
 ---
 
 # 品質チェック
 
-このアプリ（Spring Bootバックエンド + React/Viteフロントエンド）の品質を、自動チェックと設計レベルのレビューの2段階で確認する手順。
+このアプリ（Spring Bootバックエンド + React/Viteフロントエンド + Terraformによるインフラ）の品質を、自動チェックと設計レベルのレビューの2段階で確認する手順。
 
 ## この手順を使うタイミング
 
@@ -34,6 +34,17 @@ cd backend
 export JAVA_HOME=/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home
 ./gradlew check
 ```
+
+```sh
+# Terraform（フォーマット・構文チェック。AWS認証情報は不要）
+cd terraform
+terraform fmt -check -recursive
+terraform validate
+```
+
+`terraform validate`は事前に`terraform init`が実行済みである必要がある（プロバイダのダウンロードが必要なため）。未実行の場合は`terraform init`を先に行う。
+
+余力があれば`terraform plan`も実行し、意図しない差分（applyされている実際のリソースと`.tf`ファイルの内容のズレ）がないか確認する。読み取り専用なのでAWSリソースには影響しないが、実際のAWS認証情報を使って外部と通信するため、必須のチェックではなく任意とする。
 
 ### ローカル特有の注意：DBの蓄積データによる見せかけの失敗
 
@@ -77,6 +88,15 @@ docker compose up -d db
 - スキーマ管理：DBのテーブル定義変更が、`ddl-auto`任せではなく`backend/src/main/resources/db/migration/`配下の新しいバージョン番号のマイグレーションファイルとして追加されているか
 - ロギング：新しいサービスクラス・重要な更新系メソッドに、既存の`CardCommandService`/`BoardQueryService`と同じ調子でSLF4Jのログ（`private static final Logger LOG = LoggerFactory.getLogger(...)`）が入っているか
 - レイヤリング：コンストラクタインジェクション・DTOによるレスポンス分離・薄いコントローラー（業務ロジックはサービス層に）が維持されているか
+
+### Terraform・AWSインフラのチェック観点
+
+- シークレットの管理：`terraform.tfvars`・`*.tfstate*`・`.terraform/`・SSH秘密鍵（`ssh_key.pem`等）が`terraform/.gitignore`で除外されているか。`.tf`ファイル中にパスワード・鍵などの機密情報がハードコードされていないか
+- 機密変数の宣言：パスワードなど機密性のある`variable`に`sensitive = true`が付いているか
+- ネットワークの公開範囲：セキュリティグループのingressルールが必要最小限になっているか。`0.0.0.0/0`（全公開）を使っている箇所があれば、個人利用前提のこのプロジェクトで本当に必要か確認する（原則`var.allowed_ssh_cidr`のような特定IP限定であるべき）
+- 無料利用枠との整合性：`docs/infrastructure.md`に記載されたインスタンスタイプ・ストレージサイズ・Multi-AZ設定等の前提と、実際の`.tf`ファイルの値（`variables.tf`のデフォルト値、`main.tf`/`rds.tf`のリソース定義）が一致しているか
+- ドキュメントとの整合性：`docs/infrastructure.md`の構成図・リソース一覧が、実際に`terraform/`配下で定義されているリソースと食い違っていないか（リソースを追加・削除した際にドキュメント更新が漏れていないか）
+- 未使用のリソース・変数・出力（`output`）が残っていないか
 
 ## レポートのまとめ方
 

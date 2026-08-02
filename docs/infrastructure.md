@@ -72,7 +72,7 @@ flowchart LR
 
 - `providers.tf`：利用するTerraformプロバイダの宣言
 - `variables.tf`：インスタンスタイプ・許可IP・DB認証情報などの変数定義
-- `main.tf`：EC2インスタンス・SSH用セキュリティグループ・SSH鍵ペア
+- `main.tf`：EC2インスタンス・セキュリティグループ（SSH・HTTP）・SSH鍵ペア
 - `rds.tf`：RDSインスタンス・RDS用セキュリティグループ・DBサブネットグループ
 - `outputs.tf`：`terraform apply`後に表示する接続情報（EC2のIPアドレス、RDSのエンドポイント等）
 
