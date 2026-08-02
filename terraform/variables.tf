@@ -11,9 +11,9 @@ variable "project_name" {
 }
 
 variable "instance_type" {
-  description = "EC2インスタンスタイプ（無料利用枠対象のものを指定する）"
+  description = "EC2インスタンスタイプ（無料利用枠対象のものを指定する。このアカウントではt3.microが対象）"
   type        = string
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "allowed_ssh_cidr" {
