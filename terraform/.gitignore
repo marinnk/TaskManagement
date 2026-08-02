@@ -1,0 +1,6 @@
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+ssh_key.pem
+ssh_key.pub
