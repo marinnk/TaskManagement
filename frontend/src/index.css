@@ -389,15 +389,15 @@ body {
   }
 
   .board {
+    flex-direction: column;
     padding: var(--space-3xl) var(--space-lg);
     gap: var(--space-lg);
-    scroll-snap-type: x mandatory;
   }
 
   .list {
-    width: calc(100vw - 40px);
-    flex: 0 0 calc(100vw - 40px);
-    scroll-snap-align: start;
+    width: 100%;
+    flex: none;
+    max-height: none;
   }
 
   .card-delete-button {
