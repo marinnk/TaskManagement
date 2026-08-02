@@ -179,6 +179,62 @@ class CardCommandServiceTest {
         assertThat(response.displayOrder()).isEqualTo(1);
     }
 
+    @Test
+    void sortByDueDate_存在しないリストIDはNOT_FOUNDになる() {
+        when(taskListRepository.findById(99L)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> cardCommandService.sortByDueDate(99L));
+
+        assertThat(exception.getStatusCode().value()).isEqualTo(404);
+    }
+
+    @Test
+    void sortByDueDate_期限あり期限なし混在を期限昇順プラス期限なし末尾に並び替える() {
+        when(taskListRepository.findById(1L)).thenReturn(Optional.of(list(1L)));
+
+        Card undated = card(1, null);
+        Card late = card(2, LocalDate.of(2026, 8, 10));
+        Card early = card(3, LocalDate.of(2026, 8, 1));
+        when(cardRepository.findByListIdOrderByDisplayOrderAsc(1L))
+                .thenReturn(new ArrayList<>(List.of(undated, late, early)));
+
+        List<CardResponse> response = cardCommandService.sortByDueDate(1L);
+
+        List<Card> saved = captureSavedCards();
+        assertThat(saved).extracting(Card::getId).containsExactly(3L, 2L, 1L);
+        assertThat(saved).extracting(Card::getDisplayOrder).containsExactly(0, 1, 2);
+        assertThat(response).extracting(CardResponse::id).containsExactly(3L, 2L, 1L);
+    }
+
+    @Test
+    void sortByDueDate_同一期限のカードは現在の相対順序を維持する() {
+        when(taskListRepository.findById(1L)).thenReturn(Optional.of(list(1L)));
+
+        Card sameDateFirst = card(1, LocalDate.of(2026, 8, 5));
+        Card sameDateSecond = card(2, LocalDate.of(2026, 8, 5));
+        Card earlier = card(3, LocalDate.of(2026, 8, 1));
+        when(cardRepository.findByListIdOrderByDisplayOrderAsc(1L))
+                .thenReturn(new ArrayList<>(List.of(sameDateFirst, sameDateSecond, earlier)));
+
+        cardCommandService.sortByDueDate(1L);
+
+        List<Card> saved = captureSavedCards();
+        assertThat(saved).extracting(Card::getId).containsExactly(3L, 1L, 2L);
+    }
+
+    @Test
+    void sortByDueDate_空リストの場合は空のsaveAllが呼ばれ空リストを返す() {
+        when(taskListRepository.findById(1L)).thenReturn(Optional.of(list(1L)));
+        when(cardRepository.findByListIdOrderByDisplayOrderAsc(1L)).thenReturn(new ArrayList<>());
+
+        List<CardResponse> response = cardCommandService.sortByDueDate(1L);
+
+        List<Card> saved = captureSavedCards();
+        assertThat(saved).isEmpty();
+        assertThat(response).isEmpty();
+    }
+
     @SuppressWarnings("unchecked")
     private List<Card> captureSavedCards() {
         ArgumentCaptor<List<Card>> captor = ArgumentCaptor.forClass(List.class);

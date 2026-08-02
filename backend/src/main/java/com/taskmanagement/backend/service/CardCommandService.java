@@ -2,6 +2,7 @@ package com.taskmanagement.backend.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -178,6 +179,39 @@ public class CardCommandService {
                 card.getDescription(),
                 card.getDueDate(),
                 card.getDisplayOrder());
+    }
+
+    @Transactional
+    public List<CardResponse> sortByDueDate(Long listId) {
+        taskListRepository.findById(listId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "list not found: id=" + listId));
+
+        List<Card> existingCards = cardRepository.findByListIdOrderByDisplayOrderAsc(listId);
+
+        List<Card> dated = new ArrayList<>();
+        List<Card> undated = new ArrayList<>();
+        for (Card card : existingCards) {
+            if (card.getDueDate() != null) {
+                dated.add(card);
+            } else {
+                undated.add(card);
+            }
+        }
+        dated.sort(Comparator.comparing(Card::getDueDate));
+
+        List<Card> reordered = new ArrayList<>(dated);
+        reordered.addAll(undated);
+        for (int i = 0; i < reordered.size(); i++) {
+            reordered.get(i).setDisplayOrder(i);
+        }
+        cardRepository.saveAll(reordered);
+
+        LOG.info("cards sorted by due date: listId={}, count={}", listId, reordered.size());
+
+        return reordered.stream()
+                .map(c -> new CardResponse(c.getId(), c.getTitle(), c.getDescription(), c.getDueDate(), c.getDisplayOrder()))
+                .toList();
     }
 
     /**
