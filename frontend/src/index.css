@@ -1,14 +1,17 @@
 /* デザイントークン */
 :root {
   --color-primary: #f4a8c6;
+  --color-primary-hover: #ef92bb;
   --color-primary-disabled: #f9cfe0;
   --color-danger: #eb5a46;
+  --color-danger-hover: #d84f3b;
   --color-danger-disabled: #f2a79d;
   --color-danger-bg: #ffebe6;
   --color-danger-text-light: #ffd7d7;
   --color-surface: #fff;
   --color-board-bg: #fffdfa;
   --color-bg-muted: #fdf2dd;
+  --color-bg-muted-hover: #f8e6c4;
   --color-bg-subtle: #e2f8ee;
   --color-bg-faint: #bff0da;
   --color-text: #6b4c63;
@@ -72,8 +75,50 @@ body {
   min-height: calc(100vh - 56px);
 }
 
-.board-message {
+.board-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
   padding: var(--space-4xl);
+  text-align: center;
+  min-height: calc(100vh - 56px);
+}
+
+.board-status-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-text-muted);
+}
+
+.board-status-error .board-status-icon {
+  color: var(--color-danger);
+}
+
+.board-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-bg-muted);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: board-spinner-spin 0.8s linear infinite;
+}
+
+@keyframes board-spinner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-spinner {
+    animation: none;
+  }
+}
+
+.board-message {
+  margin: 0;
   color: var(--color-text);
   font-size: var(--font-size-lg);
 }
@@ -293,11 +338,29 @@ body {
   cursor: pointer;
   background: var(--color-bg-muted);
   color: var(--color-text);
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.modal-button:hover:not(:disabled) {
+  background: var(--color-bg-muted-hover);
+}
+
+.modal-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.modal-button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
 }
 
 .modal-button-primary {
   background: var(--color-primary);
   color: #fff;
+}
+
+.modal-button-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
 }
 
 .modal-button-primary:disabled {
@@ -308,6 +371,10 @@ body {
 .modal-button-danger {
   background: var(--color-danger);
   color: #fff;
+}
+
+.modal-button-danger:hover:not(:disabled) {
+  background: var(--color-danger-hover);
 }
 
 .modal-button-danger:disabled {
