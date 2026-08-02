@@ -12,3 +12,6 @@ export const deleteCard = (listId: number, cardId: number) =>
 
 export const moveCard = (cardId: number, payload: CardMoveRequest) =>
   apiPatch<CardDto>(`/api/cards/${cardId}/position`, payload);
+
+export const sortListByDueDate = (listId: number) =>
+  apiPatch<CardDto[]>(`/api/lists/${listId}/cards/sort-by-due-date`, undefined);
